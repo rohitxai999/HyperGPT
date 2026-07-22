@@ -1,5 +1,18 @@
+import os
+import time
 import streamlit as st
-from utils import chat_with_ai
+
+from utils.api import chat_with_ai, stream_text
+
+from utils.storage import (
+    get_chat_files,
+    create_chat,
+    load_chat,
+    save_chat,
+    delete_chat,
+    rename_chat,
+)
+
 
 st.set_page_config(
     page_title="HyperGPT",
@@ -7,21 +20,66 @@ st.set_page_config(
     layout="wide"
 )
 
-# --------------------------
-# Sidebar
-# --------------------------
+
+css_file = "assets/style.css"
+
+if os.path.exists(css_file):
+
+    with open(css_file, "r", encoding="utf-8") as f:
+
+        st.markdown(
+            f"<style>{f.read()}</style>",
+            unsafe_allow_html=True
+        )
+
+
+if "current_chat" not in st.session_state:
+
+    chats = get_chat_files()
+
+    if chats:
+        st.session_state.current_chat = chats[0]
+
+    else:
+        st.session_state.current_chat = create_chat()
+
+
+
+if "messages" not in st.session_state:
+
+    st.session_state.messages = load_chat(
+        st.session_state.current_chat
+    )
+
+
+
+if "last_response_time" not in st.session_state:
+
+    st.session_state.last_response_time = 0
+
+
+
+if "last_prompt" not in st.session_state:
+
+    st.session_state.last_prompt = None
+
+
+
 with st.sidebar:
+
     st.title("⚡ HyperGPT")
 
     st.markdown("---")
 
+
     model = st.selectbox(
-        "Choose Model",
+        "Choose AI Model",
         [
             "llama-3.3-70b-versatile",
             "llama-3.1-8b-instant"
         ]
     )
+
 
     temperature = st.slider(
         "Temperature",
@@ -31,69 +89,311 @@ with st.sidebar:
         0.1
     )
 
+
     st.markdown("---")
 
-    if st.button("🗑 Clear Chat"):
+
+    if st.button(
+        "➕ New Chat",
+        use_container_width=True
+    ):
+
+        st.session_state.current_chat = create_chat()
+
         st.session_state.messages = []
+
+        save_chat(
+            st.session_state.current_chat,
+            []
+        )
+
         st.rerun()
 
+
+
+    st.subheader("💬 Chat History")
+
+
+    chats = get_chat_files()
+
+
+    for chat in chats:
+
+        if st.button(
+            chat.replace(".json",""),
+            key=chat,
+            use_container_width=True
+        ):
+
+            st.session_state.current_chat = chat
+
+            st.session_state.messages = load_chat(chat)
+
+            st.rerun()
+
+
+
     st.markdown("---")
 
-    st.info(
-        """
-        HyperGPT
 
-        AI Playground
-        """
+    if st.button(
+        "🧹 Clear Messages",
+        use_container_width=True
+    ):
+
+        st.session_state.messages = []
+
+        save_chat(
+            st.session_state.current_chat,
+            []
+        )
+
+        st.rerun()
+
+
+
+    st.markdown("---")
+
+
+    st.subheader("⚙ Chat Options")
+
+
+    new_name = st.text_input(
+        "Rename Current Chat",
+        placeholder="My AI Project"
     )
 
-# --------------------------
-# Main Title
-# --------------------------
+
+    if st.button(
+        "✏ Rename Chat",
+        use_container_width=True
+    ):
+
+        if new_name.strip():
+
+            st.session_state.current_chat = rename_chat(
+                st.session_state.current_chat,
+                new_name.strip()
+            )
+
+            st.rerun()
+
+
+
+    if st.button(
+        "🗑 Delete Current Chat",
+        use_container_width=True
+    ):
+
+        delete_chat(
+            st.session_state.current_chat
+        )
+
+
+        chats = get_chat_files()
+
+
+        if chats:
+
+            st.session_state.current_chat = chats[0]
+
+            st.session_state.messages = load_chat(
+                chats[0]
+            )
+
+        else:
+
+            st.session_state.current_chat = create_chat()
+
+            st.session_state.messages = []
+
+
+        st.rerun()
+
+
+
+    st.markdown("---")
+
+    st.success("🟢 AI Online")
+
+
+    st.metric(
+        "Current Chat",
+        st.session_state.current_chat.replace(".json","")
+    )
+
+
+    st.metric(
+        "Messages",
+        len(st.session_state.messages)
+    )
+
+
+    st.metric(
+        "Model",
+        model
+    )
+
+
+    st.metric(
+        "Temperature",
+        temperature
+    )
+
+
+    st.metric(
+        "Last Response",
+        f"{st.session_state.last_response_time}s"
+    )
+
+
 
 st.title("🤖 HyperGPT")
-st.caption("Your AI Assistant")
 
-# --------------------------
-# Chat History
-# --------------------------
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+st.markdown(
+    """
+### Your Intelligent AI Workspace
+
+Ask questions, generate ideas, write code, and chat with your AI assistant.
+"""
+)
+
+
+st.divider()
+
+
 
 for message in st.session_state.messages:
+
     with st.chat_message(message["role"]):
+
         st.markdown(message["content"])
 
-# --------------------------
-# Chat Input
-# --------------------------
 
-prompt = st.chat_input("Ask anything...")
+
+prompt = st.chat_input(
+    "💬 Ask HyperGPT anything..."
+)
+
+
 
 if prompt:
 
-    # Display user message
-    st.session_state.messages.append(
-        {
-            "role": "user",
-            "content": prompt
-        }
-    )
+
+    st.session_state.last_prompt = prompt
+
 
     with st.chat_message("user"):
+
         st.markdown(prompt)
 
-    # Get AI response from FastAPI
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            response = chat_with_ai(prompt)
-            st.markdown(response)
 
-    # Save assistant response
+
     st.session_state.messages.append(
         {
-            "role": "assistant",
-            "content": response
+            "role":"user",
+            "content":prompt
         }
     )
+
+
+    save_chat(
+        st.session_state.current_chat,
+        st.session_state.messages
+    )
+
+
+
+    with st.chat_message("assistant"):
+
+
+        start_time = time.time()
+
+
+        with st.spinner("Thinking..."):
+
+            response = chat_with_ai(prompt)
+
+
+
+        end_time = time.time()
+
+
+        response_time = round(
+            end_time-start_time,
+            2
+        )
+
+
+        st.session_state.last_response_time = response_time
+
+
+
+        box = st.empty()
+
+
+        streamed = ""
+
+
+        for chunk in stream_text(response):
+
+            streamed += chunk
+
+            box.markdown(streamed)
+
+
+
+        st.caption(
+            f"⚡ Response generated in {response_time} seconds"
+        )
+
+
+        st.code(
+            response,
+            language="text"
+        )
+
+
+        if st.button(
+            "🔄 Regenerate Response"
+        ):
+
+            new_response = chat_with_ai(
+                st.session_state.last_prompt
+            )
+
+
+            st.session_state.messages.append(
+                {
+                    "role":"assistant",
+                    "content":new_response
+                }
+            )
+
+
+            save_chat(
+                st.session_state.current_chat,
+                st.session_state.messages
+            )
+
+
+            st.rerun()
+
+
+
+    st.session_state.messages.append(
+        {
+            "role":"assistant",
+            "content":response
+        }
+    )
+
+
+    save_chat(
+        st.session_state.current_chat,
+        st.session_state.messages
+    )
+
+
+    st.rerun()

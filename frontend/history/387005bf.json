@@ -1,0 +1,34 @@
+[
+    {
+        "role": "user",
+        "content": "hello"
+    },
+    {
+        "role": "assistant",
+        "content": "❌ Cannot connect to FastAPI server. Is Uvicorn running?"
+    },
+    {
+        "role": "user",
+        "content": "what is optimization"
+    },
+    {
+        "role": "assistant",
+        "content": "❌ Cannot connect to FastAPI server. Is Uvicorn running?"
+    },
+    {
+        "role": "user",
+        "content": "what is mean by optimization"
+    },
+    {
+        "role": "assistant",
+        "content": "❌ 404 Client Error: Not Found for url: http://127.0.0.1:8000/chat"
+    },
+    {
+        "role": "user",
+        "content": "what is mean by optimization"
+    },
+    {
+        "role": "assistant",
+        "content": "\nYou asked:\n\nwhat is mean by optimization\n\n\nHyperGPT response:\n\nThis is a test AI response.\nYour backend connection is working successfully 🚀\n"
+    }
+]

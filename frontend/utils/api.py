@@ -1,13 +1,18 @@
 import requests
+import time
 
 API_URL = "http://127.0.0.1:8000/chat"
 
 
 def chat_with_ai(message: str):
+
     try:
+
         response = requests.post(
             API_URL,
-            json={"message": message},
+            json={
+                "message": message
+            },
             timeout=60
         )
 
@@ -17,8 +22,22 @@ def chat_with_ai(message: str):
 
         return data["response"]
 
+
     except requests.exceptions.ConnectionError:
+
         return "❌ Cannot connect to FastAPI server. Is Uvicorn running?"
 
+
     except Exception as e:
+
         return f"❌ {e}"
+
+
+
+def stream_text(text):
+
+    for word in text.split():
+
+        yield word + " "
+
+        time.sleep(0.04)

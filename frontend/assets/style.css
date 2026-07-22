@@ -1,0 +1,45 @@
+/* Hide Streamlit Menu */
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
+
+/* Main Container */
+.block-container {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: #111827;
+}
+
+section[data-testid="stSidebar"] * {
+    color: white;
+}
+
+/* Buttons */
+.stButton > button {
+    width: 100%;
+    border-radius: 10px;
+    height: 45px;
+}
+
+/* Chat Input */
+.stChatInputContainer {
+    border-radius: 15px;
+}
+
+/* Chat Messages */
+.stChatMessage {
+    border-radius: 12px;
+    padding: 12px;
+}
