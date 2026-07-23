@@ -11,6 +11,13 @@ llm = LLMService()
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
 
-    reply = llm.generate_response(request.message)
+    reply = llm.generate_response(
+        message=request.message,
+        chat_id=request.chat_id or "default",
+        model=request.model
+    )
 
-    return ChatResponse(response=reply)
+    return ChatResponse(
+        response=reply,
+        chat_id=request.chat_id or "default"
+    )
