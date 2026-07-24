@@ -1,0 +1,320 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 4337
+>>
+stream
+0.5670000000000001 w
+0 G
+BT
+/F1 18 Tf
+20.6999999999999993 TL
+0 g
+28.3464566929133888 799.3703149606299121 Td
+(Notes: Machine Learning) Tj
+ET
+BT
+/F1 12 Tf
+13.7999999999999989 TL
+0 g
+28.3464566929133888 756.8506299212598378 Td
+(Title: Machine Learning Study Notes) Tj
+T* () Tj
+T* (Introduction to Machine Learning:) Tj
+T* (- Machine learning is a subset of artificial intelligence that focuses on enabling systems to learn) Tj
+T* (and improve from experience without being explicitly programmed.) Tj
+T* (- It involves algorithms that allow computers to find patterns and insights in data and make) Tj
+T* (decisions or predictions based on that data.) Tj
+T* () Tj
+T* (Types of Machine Learning:) Tj
+T* (1. Supervised Learning:) Tj
+T* (- In supervised learning, the algorithm is trained on a labeled dataset, where each data point is) Tj
+T* (associated with the correct output.) Tj
+T* (- The goal is to learn a mapping from input variables to output labels.) Tj
+T* (- Examples include regression and classification tasks.) Tj
+T* () Tj
+T* (2. Unsupervised Learning:) Tj
+T* (- Unsupervised learning deals with unlabeled data, where the algorithm explores the data to find) Tj
+T* (hidden patterns or structures.) Tj
+T* (- The goal is to learn about the inherent structure of the data.) Tj
+T* (- Examples include clustering and dimensionality reduction.) Tj
+T* () Tj
+T* (3. Reinforcement Learning:) Tj
+T* (- Reinforcement learning is a type of machine learning where an agent interacts with an) Tj
+T* (environment to learn how to make decisions.) Tj
+T* (- The agent receives rewards or penalties based on its actions, which guides it towards optimal) Tj
+T* (behavior.) Tj
+T* (- Examples include game playing and robot control.) Tj
+T* () Tj
+T* (Key Concepts in Machine Learning:) Tj
+T* (1. Features and Labels:) Tj
+T* (- Features are the input variables or attributes of a dataset, while labels are the outputs or) Tj
+T* (predictions.) Tj
+T* (- The goal of machine learning is to learn the relationship between features and labels to make) Tj
+T* (accurate predictions.) Tj
+T* () Tj
+T* (2. Training and Testing Data:) Tj
+T* (- A dataset is typically divided into training and testing sets to evaluate the performance of a) Tj
+T* (machine learning model.) Tj
+T* (- The model is trained on the training data to learn patterns, and then tested on the unseen) Tj
+T* (testing data to assess its generalization ability.) Tj
+T* () Tj
+T* (3. Model Evaluation:) Tj
+T* (- There are various metrics and techniques used to evaluate the performance of a machine) Tj
+T* (learning model, such as accuracy, precision, recall, F1 score, and ROC curve analysis.) Tj
+T* () Tj
+T* (Popular Machine Learning Algorithms:) Tj
+T* (1. Linear Regression:) Tj
+T* (- Linear regression is a supervised learning algorithm used for predicting continuous outcomes.) Tj
+T* (- It fits a linear relationship between the input features and the target variable.) Tj
+T* () Tj
+T* (2. Decision Trees:) Tj
+T* (- Decision trees are versatile machine learning algorithms that can perform both classification) Tj
+T* (and regression tasks.) Tj
+T* (- They make decisions by splitting the input space into regions based on feature values.) Tj
+T* () Tj
+T* (3. Support Vector Machines \(SVM\):) Tj
+T* (- SVM is a powerful supervised learning algorithm used for classification and regression.) Tj
+T* (- It finds the optimal hyperplane that best separates data points into different classes.) Tj
+T* () Tj
+T* (Applications of Machine Learning:) Tj
+T* (1. Natural Language Processing \(NLP\):) Tj
+T* (- NLP uses machine learning techniques to analyze, understand, and generate human language.) Tj
+T* (- Applications include sentiment analysis, text summarization, and machine translation.) Tj
+T* () Tj
+T* (2. Computer Vision:) Tj
+T* (- Computer vision employs machine learning algorithms to interpret visual data, such as images) Tj
+T* (and videos.) Tj
+T* (- Applications include object detection, image classification, and facial recognition.) Tj
+T* () Tj
+T* (Conclusion:) Tj
+T* (Machine learning is a dynamic and rapidly growing field with a wide range of applications across) Tj
+T* (industries. By understanding the basic concepts, algorithms, and applications of machine) Tj
+T* (learning, you can leverage its power to solve complex problems and drive innovation in various) Tj
+T* (domains.) Tj
+ET
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R ]
+/Count 1
+>>
+endobj
+5 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+6 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 5 0 R
+/F2 6 0 R
+/F3 7 0 R
+/F4 8 0 R
+/F5 9 0 R
+/F6 10 0 R
+/F7 11 0 R
+/F8 12 0 R
+/F9 13 0 R
+/F10 14 0 R
+/F11 15 0 R
+/F12 16 0 R
+/F13 17 0 R
+/F14 18 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+19 0 obj
+<<
+/Producer (jsPDF 4.2.1)
+/CreationDate (D:20260714162942+05'30')
+>>
+endobj
+20 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 21
+0000000000 65535 f 
+0000004541 00000 n 
+0000006358 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000004598 00000 n 
+0000004723 00000 n 
+0000004853 00000 n 
+0000004986 00000 n 
+0000005123 00000 n 
+0000005246 00000 n 
+0000005375 00000 n 
+0000005507 00000 n 
+0000005643 00000 n 
+0000005771 00000 n 
+0000005898 00000 n 
+0000006027 00000 n 
+0000006160 00000 n 
+0000006262 00000 n 
+0000006606 00000 n 
+0000006692 00000 n 
+trailer
+<<
+/Size 21
+/Root 20 0 R
+/Info 19 0 R
+/ID [ <F23251818782FB108B2ED064FC28D012> <F23251818782FB108B2ED064FC28D012> ]
+>>
+startxref
+6796
+%%EOF
