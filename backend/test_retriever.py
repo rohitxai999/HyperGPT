@@ -1,28 +1,34 @@
-from pathlib import Path
-
 from app.rag.loader import load_document
 from app.rag.splitter import split_documents
-from app.rag.vectorstore import create_vector_store
+from app.rag.vectorstore import create_vector_store, add_documents
 from app.rag.retriever import retrieve_documents
 
-UPLOADS = Path("uploads")
 
-pdf = list(UPLOADS.glob("*.pdf"))[0]
+# Load your test document
+documents = load_document(
+    "data/sample.txt"
+)
 
-documents = load_document(str(pdf))
+
+# Split documents into chunks
 chunks = split_documents(documents)
 
-create_vector_store(chunks)
 
-query = "What is this document about?"
+# Create Chroma collection
+vector_store = create_vector_store()
+
+
+# Store embeddings
+add_documents(chunks)
+
+
+# Query
+query = "What is artificial intelligence?"
+
 
 results = retrieve_documents(query)
 
-print("=" * 60)
-print(f"Query: {query}")
-print("=" * 60)
 
-for i, doc in enumerate(results, start=1):
-    print(f"\nResult {i}")
-    print("-" * 40)
-    print(doc.page_content[:500])
+for doc in results:
+    print("=" * 50)
+    print(doc)

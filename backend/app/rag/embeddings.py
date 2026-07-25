@@ -1,22 +1,16 @@
-from langchain_huggingface import HuggingFaceEmbeddings
-
-# Recommended free embedding model
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+from sentence_transformers import SentenceTransformer
 
 
-def get_embeddings():
-    """
-    Return a HuggingFace embedding model.
-    """
+model = SentenceTransformer(
+    "all-MiniLM-L6-v2"
+)
 
-    embeddings = HuggingFaceEmbeddings(
-        model_name=EMBEDDING_MODEL,
-        model_kwargs={
-            "device": "cpu"
-        },
-        encode_kwargs={
-            "normalize_embeddings": True
-        }
+
+def generate_embeddings(texts):
+
+    embeddings = model.encode(
+        texts,
+        convert_to_numpy=True
     )
 
-    return embeddings
+    return embeddings.tolist()

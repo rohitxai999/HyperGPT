@@ -1,8 +1,23 @@
-from app.rag.embeddings import get_embeddings
+from sentence_transformers import SentenceTransformer
 
-embedding = get_embeddings()
 
-vector = embedding.embed_query("Hello HyperGPT")
+model = SentenceTransformer(
+    "all-MiniLM-L6-v2"
+)
 
-print(f"Vector Length: {len(vector)}")
-print(vector[:10])
+
+def generate_embeddings(texts):
+
+    embeddings = model.encode(
+        texts,
+        convert_to_numpy=True
+    )
+
+    return embeddings.tolist()
+
+
+
+# compatibility function for tests
+def get_embeddings(texts):
+
+    return generate_embeddings(texts)

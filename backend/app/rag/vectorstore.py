@@ -1,33 +1,41 @@
-from langchain_core.vectorstores import InMemoryVectorStore
-
-from app.rag.embeddings import get_embeddings
-
-
-_vector_store = None
+import chromadb
+from app.rag.embeddings import generate_embeddings
 
 
-def create_vector_store(chunks):
-    """
-    Create an in-memory vector store.
-    """
-
-    global _vector_store
-
-    embeddings = get_embeddings()
-
-    _vector_store = InMemoryVectorStore(embedding=embeddings)
-
-    _vector_store.add_documents(chunks)
-
-    return _vector_store
+client = chromadb.PersistentClient(
+    path="./chroma_db"
+)
 
 
-def load_vector_store():
-    """
-    Return the current vector store.
-    """
+collection = client.get_or_create_collection(
+    name="hypergpt_documents"
+)
 
-    if _vector_store is None:
-        raise ValueError("Vector store has not been created yet.")
 
-    return _vector_store
+def create_vector_store():
+
+    return collection
+
+
+def add_documents(documents):
+
+    texts = [
+        doc.page_content 
+        for doc in documents
+    ]
+
+    embeddings = generate_embeddings(texts)
+
+    ids = [
+        str(i)
+        for i in range(len(texts))
+    ]
+
+    collection.add(
+        documents=texts,
+        embeddings=embeddings,
+        ids=ids
+    )
+
+
+    return True

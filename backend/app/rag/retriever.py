@@ -1,16 +1,27 @@
-from app.rag.vectorstore import load_vector_store
+from app.rag.vectorstore import create_vector_store
+from app.rag.embeddings import generate_embeddings
 
 
-def retrieve_documents(query: str, k: int = 4):
-    """
-    Retrieve the most relevant document chunks.
-    """
 
-    vectorstore = load_vector_store()
+def retrieve_documents(query, k=3):
 
-    results = vectorstore.similarity_search(
-        query=query,
-        k=k
+    collection = create_vector_store()
+
+
+    query_embedding = generate_embeddings(
+        [query]
+    )[0]
+
+
+    results = collection.query(
+        query_embeddings=[
+            query_embedding
+        ],
+        n_results=k
     )
 
-    return results
+
+    documents = results["documents"][0]
+
+
+    return documents

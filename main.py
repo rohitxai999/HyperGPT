@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 
@@ -8,41 +9,63 @@ app = FastAPI(
 )
 
 
+# -----------------------------
+# CORS Configuration
+# -----------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# -----------------------------
+# Request Model
+# -----------------------------
 class ChatRequest(BaseModel):
     message: str
 
 
-
+# -----------------------------
+# Home Route
+# -----------------------------
 @app.get("/")
 def home():
-
     return {
         "project": "HyperGPT",
         "version": "1.0",
+        "status": "running",
         "message": "Welcome to HyperGPT 🚀"
     }
 
 
-
+# -----------------------------
+# Chat Route
+# -----------------------------
 @app.post("/chat")
 def chat(request: ChatRequest):
 
-    user_message = request.message
-
-
-    response = f"""
-You asked:
-
-{user_message}
-
-
-HyperGPT response:
-
-This is a test AI response.
-Your backend connection is working successfully 🚀
-"""
-
-
     return {
-        "response": response
+        "response": f"""
+HyperGPT AI Assistant 🤖
+
+Your message:
+{request.message}
+
+Backend Status:
+Connected successfully 🚀
+"""
+    }
+
+
+# -----------------------------
+# Test RAG Connection
+# -----------------------------
+@app.get("/rag-test")
+def rag_test():
+    return {
+        "rag": "ready",
+        "status": "RAG module will be connected next 🚀"
     }
