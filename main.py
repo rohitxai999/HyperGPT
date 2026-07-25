@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from app.rag.retriever import retrieve_documents
+
 
 app = FastAPI(
     title="HyperGPT API",
@@ -33,6 +35,7 @@ class ChatRequest(BaseModel):
 # -----------------------------
 @app.get("/")
 def home():
+
     return {
         "project": "HyperGPT",
         "version": "1.0",
@@ -42,30 +45,34 @@ def home():
 
 
 # -----------------------------
-# Chat Route
+# Chat Route with RAG
 # -----------------------------
 @app.post("/chat")
 def chat(request: ChatRequest):
 
+    documents = retrieve_documents(
+        request.message
+    )
+
+    context = "\n".join(documents)
+
     return {
-        "response": f"""
-HyperGPT AI Assistant 🤖
 
-Your message:
-{request.message}
+        "query": request.message,
 
-Backend Status:
-Connected successfully 🚀
-"""
+        "retrieved_context": context,
+
+        "status": "RAG connected successfully 🚀"
     }
 
 
 # -----------------------------
-# Test RAG Connection
+# RAG Health Check
 # -----------------------------
 @app.get("/rag-test")
 def rag_test():
+
     return {
         "rag": "ready",
-        "status": "RAG module will be connected next 🚀"
+        "status": "Retriever connected 🚀"
     }
