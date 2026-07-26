@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.routes.rag import router as rag_router
+from app.api.orchestrator import router as orchestrator_router
 
 
 app = FastAPI(
@@ -10,6 +11,9 @@ app = FastAPI(
 )
 
 
+# -----------------------------
+# Home
+# -----------------------------
 @app.get("/")
 def home():
     return {
@@ -19,6 +23,9 @@ def home():
     }
 
 
+# -----------------------------
+# Health Check
+# -----------------------------
 @app.get("/health")
 def health():
     return {
@@ -26,9 +33,8 @@ def health():
     }
 
 
-# RAG API
-app.include_router(
-    rag_router,
-    prefix="/rag",
-    tags=["RAG"]
-)
+# -----------------------------
+# Register Routers
+# -----------------------------
+app.include_router(rag_router)
+app.include_router(orchestrator_router)
