@@ -4,6 +4,9 @@ from app.config.settings import GROQ_API_KEY
 from app.models.database import SessionLocal
 from app.models.chat import Chat
 
+# Multi-Agent Orchestrator
+from app.agents.orchestrator import Orchestrator
+
 client = Groq(api_key=GROQ_API_KEY)
 
 
@@ -11,6 +14,7 @@ class LLMService:
 
     def __init__(self):
         self.chat_history = {}
+        self.orchestrator = Orchestrator()
 
     def generate_response(
         self,
@@ -23,7 +27,23 @@ class LLMService:
 
         try:
 
-            # Create new conversation if needed
+            # -------------------------------------
+            # Multi-Agent Routing
+            # -------------------------------------
+            agent_response = self.orchestrator.route(message)
+
+            # If Coding, Writing or Planning Agent is selected,
+            # return its response immediately.
+            if (
+                agent_response.startswith("💻")
+                or agent_response.startswith("✍️")
+                or agent_response.startswith("📅")
+            ):
+                return agent_response
+
+            # -------------------------------------
+            # Create Conversation
+            # -------------------------------------
             if chat_id not in self.chat_history:
 
                 self.chat_history[chat_id] = [
@@ -31,15 +51,14 @@ class LLMService:
                         "role": "system",
                         "content": (
                             "You are HyperGPT, an advanced AI assistant. "
-                            "Be helpful, accurate, and friendly."
+                            "Be helpful, accurate, friendly, and professional."
                         )
                     }
                 ]
 
-            # -------------------------
+            # -------------------------------------
             # Save User Message
-            # -------------------------
-
+            # -------------------------------------
             self.chat_history[chat_id].append(
                 {
                     "role": "user",
@@ -57,10 +76,9 @@ class LLMService:
 
             db.commit()
 
-            # -------------------------
+            # -------------------------------------
             # Ask Groq
-            # -------------------------
-
+            # -------------------------------------
             response = client.chat.completions.create(
                 model=model,
                 messages=self.chat_history[chat_id],
@@ -70,10 +88,9 @@ class LLMService:
 
             ai_reply = response.choices[0].message.content
 
-            # -------------------------
+            # -------------------------------------
             # Save Assistant Response
-            # -------------------------
-
+            # -------------------------------------
             self.chat_history[chat_id].append(
                 {
                     "role": "assistant",
