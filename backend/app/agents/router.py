@@ -17,10 +17,20 @@ class TaskRouter:
         ]
 
     def route(self, query: str):
+
         matched = []
 
         for agent in self.agents:
-            if agent.can_handle(query):
-                matched.append(agent)
+            try:
+                if agent.can_handle(query):
+                    matched.append(agent)
+            except Exception:
+                pass
+
+        # -----------------------------
+        # Fallback
+        # -----------------------------
+        if not matched:
+            matched.append(self.agents[-1])   # Default to RAGAgent
 
         return matched

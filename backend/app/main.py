@@ -3,12 +3,20 @@ from fastapi import FastAPI
 from app.routes.rag import router as rag_router
 from app.api.orchestrator import router as orchestrator_router
 
+# Database
+from app.database.session import init_database
+
 
 app = FastAPI(
     title="HyperGPT API",
     version="1.0.0",
     description="HyperGPT AI Assistant"
 )
+
+# -----------------------------
+# Initialize Database
+# -----------------------------
+init_database()
 
 
 # -----------------------------
