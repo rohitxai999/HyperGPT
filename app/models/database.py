@@ -23,3 +23,8 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+# Import all models so SQLAlchemy registers them
+from app.models.chat import Chat
+from app.models.memory import Memory

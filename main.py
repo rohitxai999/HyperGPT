@@ -4,6 +4,17 @@ from pydantic import BaseModel
 
 from app.rag.retriever import retrieve_documents
 
+# Database Imports
+from app.models.database import Base, engine
+
+# Import models so SQLAlchemy registers all tables
+from app.models.chat import Chat
+from app.models.memory import Memory
+
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI(
     title="HyperGPT API",
@@ -57,11 +68,8 @@ def chat(request: ChatRequest):
     context = "\n".join(documents)
 
     return {
-
         "query": request.message,
-
         "retrieved_context": context,
-
         "status": "RAG connected successfully 🚀"
     }
 
@@ -75,4 +83,16 @@ def rag_test():
     return {
         "rag": "ready",
         "status": "Retriever connected 🚀"
+    }
+
+
+# -----------------------------
+# Memory Health Check
+# -----------------------------
+@app.get("/memory-test")
+def memory_test():
+
+    return {
+        "memory": "ready",
+        "status": "Memory Engine connected 🚀"
     }

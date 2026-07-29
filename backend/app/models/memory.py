@@ -9,7 +9,13 @@ class Memory(Base):
     __tablename__ = "memories"
 
     id = Column(Integer, primary_key=True, index=True)
+
     user_id = Column(String, default="default", index=True)
+
     content = Column(Text, nullable=False)
+
+    # Day 12
     importance = Column(Integer, default=1)
+    category = Column(String, default="Conversation")
+
     created_at = Column(DateTime, default=datetime.utcnow)
