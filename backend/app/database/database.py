@@ -16,6 +16,21 @@ SessionLocal = sessionmaker(
 
 Base = declarative_base()
 
+# Import models so SQLAlchemy knows about them
+# Add new models here as HyperGPT grows
+try:
+    from app.memory.models import Memory  # Existing memory model
+except ImportError:
+    pass
+
+try:
+    from app.profile.models import UserProfile  # Day 13 profile model
+except ImportError:
+    pass
+
+# Create all registered tables
+Base.metadata.create_all(bind=engine)
+
 
 def get_db():
     db = SessionLocal()
