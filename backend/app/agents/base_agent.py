@@ -1,24 +1,23 @@
 from abc import ABC, abstractmethod
+from typing import Any, Dict
 
 
 class BaseAgent(ABC):
     """
-    Base class for all HyperGPT agents.
+    Base class for every HyperGPT agent.
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, description: str):
         self.name = name
+        self.description = description
 
     @abstractmethod
-    def can_handle(self, query: str) -> bool:
-        """
-        Return True if this agent can handle the query.
-        """
+    def execute(self, task: str, context: Dict[str, Any] | None = None):
+        """Execute the assigned task."""
         pass
 
-    @abstractmethod
-    def run(self, query: str):
-        """
-        Execute the agent.
-        """
-        pass
+    def info(self):
+        return {
+            "name": self.name,
+            "description": self.description,
+        }

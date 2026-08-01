@@ -1,26 +1,47 @@
+from typing import Any, Dict
+
 from app.agents.base_agent import BaseAgent
 
 
 class CodingAgent(BaseAgent):
+    """
+    Coding Agent
+
+    Responsible for:
+    - Code generation
+    - Bug fixing
+    - Code explanation
+    - Code optimization
+    """
 
     def __init__(self):
-        super().__init__("Coding Agent")
+        super().__init__(
+            name="Coding Agent",
+            description="Generates, explains and improves code."
+        )
 
-    def can_handle(self, query: str) -> bool:
-        keywords = [
-            "python",
-            "code",
-            "bug",
-            "program",
-            "function",
-            "api",
-            "fastapi",
-            "javascript",
-        ]
-        return any(word in query.lower() for word in keywords)
-
-    def run(self, query: str):
+    def execute(
+        self,
+        task: str,
+        context: Dict[str, Any] | None = None
+    ):
         return {
             "agent": self.name,
-            "response": f"Processing coding request: {query}",
+            "task": task,
+            "generated_code": "",
+            "explanation": "",
+            "suggestions": [],
+            "status": "success"
         }
+
+    def generate_code(self, prompt: str):
+        return ""
+
+    def explain_code(self, code: str):
+        return ""
+
+    def optimize_code(self, code: str):
+        return ""
+
+    def debug_code(self, code: str):
+        return ""

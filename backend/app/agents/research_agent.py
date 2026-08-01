@@ -1,25 +1,34 @@
+from typing import Any, Dict
+
 from app.agents.base_agent import BaseAgent
 
 
 class ResearchAgent(BaseAgent):
+    """
+    Research Agent
+
+    Responsible for:
+    - Memory lookup
+    - RAG retrieval
+    - Fact gathering
+    """
 
     def __init__(self):
-        super().__init__("Research Agent")
+        super().__init__(
+            name="Research Agent",
+            description="Finds relevant knowledge from memory and RAG."
+        )
 
-    def can_handle(self, query: str) -> bool:
-        keywords = [
-            "research",
-            "explain",
-            "what",
-            "why",
-            "how",
-            "compare",
-            "summary",
-        ]
-        return any(word in query.lower() for word in keywords)
-
-    def run(self, query: str):
+    def execute(
+        self,
+        task: str,
+        context: Dict[str, Any] | None = None
+    ):
         return {
             "agent": self.name,
-            "response": f"Researching: {query}",
+            "task": task,
+            "memory": [],
+            "rag_results": [],
+            "facts": [],
+            "status": "success"
         }
