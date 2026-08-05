@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS memories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    memory_type TEXT NOT NULL,
+
+    content TEXT NOT NULL,
+
+    importance INTEGER DEFAULT 1,
+
+    tags TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
