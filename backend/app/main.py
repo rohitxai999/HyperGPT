@@ -1,48 +1,17 @@
 from fastapi import FastAPI
 
-from app.routes.rag import router as rag_router
-from app.api.orchestrator import router as orchestrator_router
-
-# Database
-from app.database.session import init_database
-
+from app.api.tools import router as tools_router
 
 app = FastAPI(
-    title="HyperGPT API",
-    version="1.0.0",
-    description="HyperGPT AI Assistant"
+    title="HyperGPT",
+    version="1.0.0"
 )
 
-# -----------------------------
-# Initialize Database
-# -----------------------------
-init_database()
+app.include_router(tools_router)
 
 
-# -----------------------------
-# Home
-# -----------------------------
 @app.get("/")
-def home():
+def root():
     return {
-        "project": "HyperGPT",
-        "status": "Running",
-        "version": "1.0.0"
+        "message": "HyperGPT Backend Running"
     }
-
-
-# -----------------------------
-# Health Check
-# -----------------------------
-@app.get("/health")
-def health():
-    return {
-        "status": "healthy"
-    }
-
-
-# -----------------------------
-# Register Routers
-# -----------------------------
-app.include_router(rag_router)
-app.include_router(orchestrator_router)
