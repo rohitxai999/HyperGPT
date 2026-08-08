@@ -9,100 +9,130 @@ from app.services.context_service import ContextService
 
 class Orchestrator:
     """
-    Coordinates all agents and combines their responses.
+    Coordinates HyperGPT agents and provides them
+    with memory and RAG context.
     """
 
     def __init__(self):
 
         self.router = TaskRouter()
 
-        # Existing memory system
         self.memory_store = MemoryStore()
         self.semantic = SemanticSearch()
         self.memory_analyzer = MemoryAnalyzer()
 
-        # Day 12 unified context system
         self.context_service = ContextService()
-
 
     def run(self, query: str):
 
-        # -----------------------------
+        # ---------------------------------
         # Retrieve unified context
-        # -----------------------------
+        # ---------------------------------
+
         context = self.context_service.get_full_context(query)
 
         related_memories = context["memories"]
         documents = context["documents"]
 
+        # ---------------------------------
+        # Build agent context
+        # ---------------------------------
+
+        agent_context = {
+            "query": query,
+            "memories": related_memories,
+            "documents": documents,
+        }
+
+        # ---------------------------------
+        # Route query
+        # ---------------------------------
 
         agents = self.router.route(query)
 
-
         if not agents:
+
             return {
                 "query": query,
-                "memories": related_memories,
-                "documents": documents,
+                "memory_context": related_memories,
+                "rag_context": documents,
                 "responses": [],
-                "final_response": "Sorry, I couldn't determine which agent should handle this request."
+                "final_response": (
+                    "Sorry, I couldn't determine "
+                    "which agent should handle this request."
+                ),
             }
-
 
         responses = []
 
+        # ---------------------------------
+        # Execute agents with context
+        # ---------------------------------
 
         for agent in agents:
 
-            result = agent.run(query)
+            try:
+
+                result = agent.run(
+                    query,
+                    context=agent_context
+                )
+
+            except TypeError:
+
+                # Backward compatibility for agents
+                # that still accept only query.
+                result = agent.run(query)
 
             responses.append(result)
 
-
+        # ---------------------------------
+        # Synthesize response
+        # ---------------------------------
 
         final_text = "\n".join(
             f"[{r['agent']}] {r['response']}"
             for r in responses
         )
 
+        # ---------------------------------
+        # Automatic memory analysis
+        # ---------------------------------
 
-        # -----------------------------
-        # Automatic Memory Analysis
-        # -----------------------------
         memory_analysis = self.memory_analyzer.analyze(query)
 
-
-
-        # -----------------------------
+        # ---------------------------------
         # Save important memories
-        # -----------------------------
+        # ---------------------------------
+
         if memory_analysis["importance"] >= 0.5:
 
-
             memory = self.memory_store.save_memory(
-                content=f"User: {query}\nAssistant: {final_text}",
+                content=(
+                    f"User: {query}\n"
+                    f"Assistant: {final_text}"
+                ),
                 user_id="default",
-                importance=memory_analysis["importance"]
+                importance=memory_analysis["importance"],
             )
 
-
-            # Index memory
+            # Index new memory
             self.semantic.add_memory(
                 memory.id,
-                memory.content
+                memory.content,
             )
-
 
         return {
 
             "query": query,
 
-            # Day 12 Context
             "memory_context": related_memories,
+
             "rag_context": documents,
 
-            # Agent output
+            "agent_context": agent_context,
+
             "responses": responses,
 
-            "final_response": final_text
+            "final_response": final_text,
         }

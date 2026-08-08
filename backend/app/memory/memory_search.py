@@ -1,7 +1,22 @@
+import re
+
 from app.memory.memory_store import MemoryStore
 
 
 class MemorySearch:
+    """
+    Keyword-based memory retrieval with stopword filtering.
+    """
+
+    STOPWORDS = {
+        "i", "me", "my", "mine", "the", "a", "an",
+        "is", "are", "am", "was", "were", "be",
+        "do", "does", "did", "what", "which", "who",
+        "how", "why", "when", "where", "and", "or",
+        "to", "of", "for", "in", "on", "with",
+        "should", "can", "could", "would", "will",
+        "please", "you", "your"
+    }
 
     def __init__(self):
         self.store = MemoryStore()
@@ -10,30 +25,60 @@ class MemorySearch:
 
         memories = self.store.get_all_memories()
 
-        query = query.lower()
+        words = re.findall(
+            r"\b[a-zA-Z0-9]+\b",
+            query.lower()
+        )
+
+        query_words = [
+            word
+            for word in words
+            if word not in self.STOPWORDS
+        ]
+
+        if not query_words:
+            return []
 
         results = []
 
         for memory in memories:
 
-            score = 0
+            content = memory.content.lower()
 
-            if query in memory.content.lower():
-                score += 5
+            content_words = set(
+                re.findall(
+                    r"\b[a-zA-Z0-9]+\b",
+                    content
+                )
+            )
 
-            for word in query.split():
-                if word in memory.content.lower():
-                    score += 1
+            keyword_matches = sum(
+                1
+                for word in query_words
+                if word in content_words
+            )
 
-            score += memory.importance
+            if keyword_matches == 0:
+                continue
 
-            if score > 0:
-                results.append((score, memory))
+            score = (
+                keyword_matches * 5
+                + memory.importance
+            )
 
-        results.sort(key=lambda x: x[0], reverse=True)
+            results.append(
+                (score, memory)
+            )
 
-        return [memory for score, memory in results[:limit]]
+        results.sort(
+            key=lambda x: x[0],
+            reverse=True
+        )
+
+        return [
+            memory
+            for score, memory in results[:limit]
+        ]
 
     def recent(self, limit: int = 5):
-
         return self.store.get_all_memories()[:limit]
