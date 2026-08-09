@@ -4,46 +4,84 @@ from app.tools.logger import logger
 
 class ToolExecutor:
     """
-    Executes the appropriate tool based on the user's request.
+    Generic executor for HyperGPT tools.
+
+    Uses explainable tool selection and delegates
+    argument preparation to the selected tool.
     """
 
     def __init__(self):
         self.selector = ToolSelector()
 
     async def execute(self, user_input: str):
+        """
+        Select and execute the appropriate tool.
+        """
+
+        selection = self.selector.select_with_explanation(
+            user_input
+        )
+
+        selected_name = selection["selected_tool"]
+
+        if selected_name is None:
+            result = {
+                "success": False,
+                "message": "No suitable tool found.",
+                "selection": selection
+            }
+
+            logger.log(
+                "none",
+                user_input,
+                result
+            )
+
+            return result
+
         tool = self.selector.select(user_input)
 
         if tool is None:
             result = {
                 "success": False,
-                "message": "No suitable tool found."
+                "message": "Selected tool could not be loaded.",
+                "selection": selection
             }
 
-            logger.log("none", user_input, result)
-            return result
-
-        # Calculator Tool
-        if tool.name == "calculator":
-            expression = (
-                user_input.lower()
-                .replace("calculate", "")
-                .strip()
+            logger.log(
+                "none",
+                user_input,
+                result
             )
 
-            result = await tool.execute(expression=expression)
+            return result
 
-        # Date & Time Tool
-        elif tool.name == "datetime":
-            result = await tool.execute()
+        try:
+            arguments = tool.prepare_arguments(
+                user_input
+            )
 
-        # Unknown Tool
-        else:
+            result = await tool.execute(
+                **arguments
+            )
+
+        except Exception as exc:
+
             result = {
                 "success": False,
-                "message": "Tool execution not implemented."
+                "tool": tool.name,
+                "message": "Tool execution failed.",
+                "error": str(exc)
             }
 
-        # Log every execution
-        logger.log(tool.name, user_input, result)
+        # Attach selection information to the result.
+        if isinstance(result, dict):
+            result["selection"] = selection
+
+        logger.log(
+            tool.name,
+            user_input,
+            result
+        )
 
         return result
