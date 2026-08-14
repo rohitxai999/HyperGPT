@@ -1,4 +1,5 @@
 import chromadb
+
 from app.rag.embeddings import generate_embeddings
 
 
@@ -12,30 +13,40 @@ collection = client.get_or_create_collection(
 )
 
 
-def create_vector_store():
+def create_vector_store(documents=None):
+    """
+    Create or return the HyperGPT vector store.
+
+    If documents are provided, they are embedded
+    and added to the Chroma collection.
+    """
+
+    if documents:
+
+        texts = [
+            doc.page_content
+            for doc in documents
+        ]
+
+        embeddings = generate_embeddings(texts)
+
+        ids = [
+            f"doc_{i}"
+            for i in range(len(texts))
+        ]
+
+        collection.upsert(
+            documents=texts,
+            embeddings=embeddings,
+            ids=ids
+        )
 
     return collection
 
 
 def add_documents(documents):
+    """
+    Add documents to the existing vector store.
+    """
 
-    texts = [
-        doc.page_content 
-        for doc in documents
-    ]
-
-    embeddings = generate_embeddings(texts)
-
-    ids = [
-        str(i)
-        for i in range(len(texts))
-    ]
-
-    collection.add(
-        documents=texts,
-        embeddings=embeddings,
-        ids=ids
-    )
-
-
-    return True
+    return create_vector_store(documents)

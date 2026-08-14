@@ -1,19 +1,17 @@
-from chat.prompt import build_prompt
+from app.services.context_service import ContextService
 
-history = [
-    {"role": "user", "content": "Hello"},
-    {"role": "assistant", "content": "Hi!"},
-]
 
-docs = [
-    "Artificial Intelligence is the simulation of human intelligence.",
-    "Machine Learning is a subset of AI.",
-]
+def test_context_service():
 
-prompt = build_prompt(
-    question="What is AI?",
-    documents=docs,
-    history=history,
-)
+    service = ContextService()
 
-print(prompt)
+    result = service.get_full_context(
+        "What is artificial intelligence?"
+    )
+
+    assert result is not None
+    assert "memories" in result
+    assert "documents" in result
+
+    assert isinstance(result["memories"], list)
+    assert isinstance(result["documents"], list)

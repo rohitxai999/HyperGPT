@@ -5,6 +5,7 @@ from app.rag.splitter import split_documents
 from app.rag.vectorstore import create_vector_store
 from app.rag.retriever import retrieve_documents
 
+
 UPLOADS_DIR = Path("uploads")
 UPLOADS_DIR.mkdir(exist_ok=True)
 
@@ -12,7 +13,7 @@ UPLOADS_DIR.mkdir(exist_ok=True)
 def process_document(file_path: str):
     """
     Load a document, split it into chunks,
-    and create the vector store.
+    and create/update the vector store.
     """
 
     documents = load_document(file_path)
@@ -35,8 +36,10 @@ def ask_document(question: str):
 
     results = retrieve_documents(question)
 
+    # Retriever currently returns text strings.
     answer = "\n\n".join(
-        [doc.page_content for doc in results]
+        str(result)
+        for result in results
     )
 
     return {

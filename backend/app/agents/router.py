@@ -8,29 +8,136 @@ from app.agents.rag_agent import RAGAgent
 class TaskRouter:
 
     def __init__(self):
+
+        self.coding_agent = CodingAgent()
+        self.writing_agent = WritingAgent()
+        self.research_agent = ResearchAgent()
+        self.math_agent = MathAgent()
+        self.rag_agent = RAGAgent()
+
+        # Specific agents are checked before general agents.
         self.agents = [
-            CodingAgent(),
-            WritingAgent(),
-            ResearchAgent(),
-            MathAgent(),
-            RAGAgent(),
+            self.coding_agent,
+            self.math_agent,
+            self.research_agent,
+            self.writing_agent,
+            self.rag_agent,
         ]
 
     def route(self, query: str):
 
-        matched = []
+        query_lower = query.lower()
+
+        # ---------------------------------
+        # Coding priority
+        # ---------------------------------
+
+        coding_keywords = [
+            "write code",
+            "write python",
+            "python code",
+            "code for",
+            "program",
+            "programming",
+            "function",
+            "class",
+            "script",
+            "debug",
+            "bug",
+            "algorithm",
+            "factorial",
+        ]
+
+        if any(
+            keyword in query_lower
+            for keyword in coding_keywords
+        ):
+            return [self.coding_agent]
+
+        # ---------------------------------
+        # Math priority
+        # ---------------------------------
+
+        math_keywords = [
+            "calculate",
+            "solve",
+            "equation",
+            "math",
+            "algebra",
+            "integral",
+            "derivative",
+            "multiply",
+            "add",
+            "subtract",
+            "divide",
+        ]
+
+        if any(
+            keyword in query_lower
+            for keyword in math_keywords
+        ):
+            return [self.math_agent]
+
+        # ---------------------------------
+        # Research priority
+        # ---------------------------------
+
+        research_keywords = [
+            "explain",
+            "what is",
+            "what are",
+            "why",
+            "how does",
+            "research",
+            "analyze",
+            "analysis",
+            "information about",
+            "tell me about",
+        ]
+
+        if any(
+            keyword in query_lower
+            for keyword in research_keywords
+        ):
+            return [self.research_agent]
+
+        # ---------------------------------
+        # Writing priority
+        # ---------------------------------
+
+        writing_keywords = [
+            "write",
+            "rewrite",
+            "draft",
+            "essay",
+            "introduction",
+            "email",
+            "article",
+            "story",
+            "content",
+            "professional",
+        ]
+
+        if any(
+            keyword in query_lower
+            for keyword in writing_keywords
+        ):
+            return [self.writing_agent]
+
+        # ---------------------------------
+        # Capability-based fallback
+        # ---------------------------------
 
         for agent in self.agents:
+
             try:
                 if agent.can_handle(query):
-                    matched.append(agent)
+                    return [agent]
             except Exception:
-                pass
+                continue
 
-        # -----------------------------
-        # Fallback
-        # -----------------------------
-        if not matched:
-            matched.append(self.agents[-1])   # Default to RAGAgent
+        # ---------------------------------
+        # Final fallback
+        # ---------------------------------
 
-        return matched
+        return [self.rag_agent]
