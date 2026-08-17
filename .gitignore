@@ -3,3 +3,10 @@ __pycache__/
 *.pyc
 venv/
 .venv/
+
+# Runtime databases
+*.db
+*.sqlite3
+
+# Vector database
+chroma_db/
