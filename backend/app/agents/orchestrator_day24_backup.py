@@ -1,4 +1,4 @@
-﻿from app.agents.router import TaskRouter
+from app.agents.router import TaskRouter
 
 from app.memory.memory_store import MemoryStore
 from app.memory.semantic_search import SemanticSearch
@@ -24,6 +24,10 @@ class Orchestrator:
         self.context_service = ContextService()
 
     def _format_agent_response(self, result: dict) -> str:
+        """
+        Convert different agent response formats into
+        one clean final response.
+        """
 
         agent = result.get(
             "agent",
@@ -59,30 +63,7 @@ class Orchestrator:
             return response
 
         # ---------------------------------
-        # Planner Agent
-        # ---------------------------------
-
-        if result.get("plan"):
-
-            plan = result["plan"]
-
-            response = (
-                f"[{agent}]\n\n"
-                f"Execution Plan:\n"
-            )
-
-            for index, step in enumerate(
-                plan,
-                start=1
-            ):
-                response += (
-                    f"{index}. {step}\n"
-                )
-
-            return response.rstrip()
-
-        # ---------------------------------
-        # Research / Writing / RAG
+        # Normal agents
         # ---------------------------------
 
         response = result.get(
@@ -90,21 +71,9 @@ class Orchestrator:
         )
 
         if response:
-
             return (
-                f"[{agent}]\n\n"
+                f"[{agent}] "
                 f"{response}"
-            )
-
-        # ---------------------------------
-        # Generic result
-        # ---------------------------------
-
-        if result.get("task"):
-
-            return (
-                f"[{agent}]\n\n"
-                f"Task: {result['task']}"
             )
 
         # ---------------------------------
@@ -112,7 +81,7 @@ class Orchestrator:
         # ---------------------------------
 
         return (
-            f"[{agent}]\n\n"
+            f"[{agent}] "
             f"No response generated."
         )
 
@@ -143,7 +112,9 @@ class Orchestrator:
         # Route query
         # ---------------------------------
 
-        agents = self.router.route(query)
+        agents = self.router.route(
+            query
+        )
 
         if not agents:
 
@@ -176,6 +147,9 @@ class Orchestrator:
 
             except AttributeError:
 
+                # Some agents implement execute()
+                # instead of run().
+
                 result = agent.execute(
                     query,
                     context=agent_context
@@ -183,22 +157,30 @@ class Orchestrator:
 
             except TypeError:
 
+                # Backward compatibility for agents
+                # that only accept query.
+
                 try:
-
-                    result = agent.run(query)
-
+                    result = agent.run(
+                        query
+                    )
                 except AttributeError:
+                    result = agent.execute(
+                        query
+                    )
 
-                    result = agent.execute(query)
-
-            responses.append(result)
+            responses.append(
+                result
+            )
 
         # ---------------------------------
-        # Format responses
+        # Build final response
         # ---------------------------------
 
         formatted_responses = [
-            self._format_agent_response(result)
+            self._format_agent_response(
+                result
+            )
             for result in responses
         ]
 
@@ -211,7 +193,9 @@ class Orchestrator:
         # ---------------------------------
 
         memory_analysis = (
-            self.memory_analyzer.analyze(query)
+            self.memory_analyzer.analyze(
+                query
+            )
         )
 
         # ---------------------------------
@@ -241,10 +225,24 @@ class Orchestrator:
         # ---------------------------------
 
         return {
+
             "query": query,
-            "memory_context": related_memories,
-            "rag_context": documents,
-            "agent_context": agent_context,
+
+            "memory_context": (
+                related_memories
+            ),
+
+            "rag_context": (
+                documents
+            ),
+
+            "agent_context": (
+                agent_context
+            ),
+
             "responses": responses,
-            "final_response": final_text,
+
+            "final_response": (
+                final_text
+            ),
         }

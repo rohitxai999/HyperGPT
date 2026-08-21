@@ -1,50 +1,66 @@
-from app.agents.research_agent import ResearchAgent
-from app.agents.coding_agent import CodingAgent
-from app.agents.writing_agent import WritingAgent
-from app.agents.planning_agent import PlanningAgent
+from app.agents.agent_registry import AgentRegistry
+from app.agents.router import DynamicRouter
 
 
 class Orchestrator:
 
     def __init__(self):
-        self.research = ResearchAgent()
-        self.coding = CodingAgent()
-        self.writing = WritingAgent()
-        self.planning = PlanningAgent()
+        self.registry = AgentRegistry()
+        self.router = DynamicRouter()
 
     def route(self, prompt: str):
 
-        text = prompt.lower()
+        agents_used = self.router.route(prompt)
 
-        if any(word in text for word in [
-            "code",
-            "python",
-            "java",
-            "bug",
-            "debug",
-            "program",
-            "function"
-        ]):
-            return self.coding.process(prompt)
+        responses = {}
 
-        elif any(word in text for word in [
-            "email",
-            "blog",
-            "essay",
-            "article",
-            "write",
-            "letter"
-        ]):
-            return self.writing.process(prompt)
+        for agent_name in agents_used:
 
-        elif any(word in text for word in [
-            "plan",
-            "roadmap",
-            "schedule",
-            "timeline",
-            "learning"
-        ]):
-            return self.planning.process(prompt)
+            agent = self.registry.get(agent_name)
 
-        else:
-            return self.research.process(prompt)
+            if agent is None:
+                continue
+
+            try:
+                responses[agent_name] = agent.process(prompt)
+
+            except Exception as exc:
+                responses[agent_name] = (
+                    f"Agent execution error: {exc}"
+                )
+
+        final_response = self.synthesize(
+            prompt,
+            agents_used,
+            responses
+        )
+
+        return {
+            "agents_used": agents_used,
+            "responses": responses,
+            "final_response": final_response,
+        }
+
+    def synthesize(
+        self,
+        prompt: str,
+        agents_used: list[str],
+        responses: dict
+    ) -> str:
+
+        if not responses:
+            return "I was unable to execute an appropriate agent."
+
+        # For now, combine specialist responses.
+        # LLM-based synthesis will be added after the
+        # orchestration pipeline is verified.
+
+        parts = []
+
+        for agent_name, response in responses.items():
+
+            parts.append(
+                f"[{agent_name.upper()} AGENT]\n{response}"
+            )
+
+        return "\n\n".join(parts)

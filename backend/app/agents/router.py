@@ -1,42 +1,19 @@
-from app.agents.coding_agent import CodingAgent
+﻿from app.agents.coding_agent import CodingAgent
 from app.agents.writing_agent import WritingAgent
 from app.agents.research_agent import ResearchAgent
 from app.agents.math_agent import MathAgent
 from app.agents.rag_agent import RAGAgent
+from app.agents.planner_agent import PlannerAgent
 
 
 class TaskRouter:
 
-    def __init__(self):
-
-        self.coding_agent = CodingAgent()
-        self.writing_agent = WritingAgent()
-        self.research_agent = ResearchAgent()
-        self.math_agent = MathAgent()
-        self.rag_agent = RAGAgent()
-
-        # Specific agents are checked before general agents.
-        self.agents = [
-            self.coding_agent,
-            self.math_agent,
-            self.research_agent,
-            self.writing_agent,
-            self.rag_agent,
-        ]
-
-    def route(self, query: str):
-
-        query_lower = query.lower()
-
-        # ---------------------------------
-        # Coding priority
-        # ---------------------------------
-
-        coding_keywords = [
-            "write code",
-            "write python",
-            "python code",
-            "code for",
+    KEYWORDS = {
+        "coding": [
+            "code",
+            "python",
+            "java",
+            "javascript",
             "program",
             "programming",
             "function",
@@ -45,20 +22,12 @@ class TaskRouter:
             "debug",
             "bug",
             "algorithm",
-            "factorial",
-        ]
+            "api",
+            "sql",
+            "database",
+        ],
 
-        if any(
-            keyword in query_lower
-            for keyword in coding_keywords
-        ):
-            return [self.coding_agent]
-
-        # ---------------------------------
-        # Math priority
-        # ---------------------------------
-
-        math_keywords = [
+        "math": [
             "calculate",
             "solve",
             "equation",
@@ -70,74 +39,137 @@ class TaskRouter:
             "add",
             "subtract",
             "divide",
-        ]
+        ],
 
-        if any(
-            keyword in query_lower
-            for keyword in math_keywords
-        ):
-            return [self.math_agent]
-
-        # ---------------------------------
-        # Research priority
-        # ---------------------------------
-
-        research_keywords = [
+        "research": [
+            "research",
             "explain",
             "what is",
             "what are",
             "why",
             "how does",
-            "research",
             "analyze",
             "analysis",
-            "information about",
-            "tell me about",
-        ]
+            "compare",
+            "investigate",
+            "information",
+            "study",
+            "report",
+        ],
 
-        if any(
-            keyword in query_lower
-            for keyword in research_keywords
-        ):
-            return [self.research_agent]
-
-        # ---------------------------------
-        # Writing priority
-        # ---------------------------------
-
-        writing_keywords = [
+        "writing": [
             "write",
             "rewrite",
             "draft",
             "essay",
-            "introduction",
             "email",
             "article",
             "story",
             "content",
+            "letter",
             "professional",
+        ],
+
+        "planning": [
+            "plan",
+            "planning",
+            "roadmap",
+            "schedule",
+            "timeline",
+            "strategy",
+            "steps",
+            "project plan",
+            "learning plan",
+            "learning roadmap",
+        ],
+
+        "rag": [
+            "document",
+            "documents",
+            "file",
+            "files",
+            "pdf",
+            "uploaded",
+            "knowledge base",
+            "according to my documents",
+            "according to the document",
+        ],
+    }
+
+    def __init__(self):
+
+        self.agent_map = {
+            "coding": CodingAgent(),
+            "math": MathAgent(),
+            "research": ResearchAgent(),
+            "writing": WritingAgent(),
+            "planning": PlannerAgent(),
+            "rag": RAGAgent(),
+        }
+
+    def route(self, query: str):
+
+        query_lower = query.lower()
+
+        scores = {
+            agent: 0
+            for agent in self.KEYWORDS
+        }
+
+        # ---------------------------------
+        # Score every capability
+        # ---------------------------------
+
+        for agent, keywords in self.KEYWORDS.items():
+
+            for keyword in keywords:
+
+                if keyword in query_lower:
+                    scores[agent] += 1
+
+        # ---------------------------------
+        # Select all relevant agents
+        # ---------------------------------
+
+        selected = [
+            agent
+            for agent, score in scores.items()
+            if score > 0
         ]
 
-        if any(
-            keyword in query_lower
-            for keyword in writing_keywords
-        ):
-            return [self.writing_agent]
-
         # ---------------------------------
-        # Capability-based fallback
+        # Capability fallback
         # ---------------------------------
 
-        for agent in self.agents:
+        if not selected:
 
-            try:
-                if agent.can_handle(query):
-                    return [agent]
-            except Exception:
-                continue
+            for name, agent in self.agent_map.items():
+
+                try:
+
+                    if agent.can_handle(query):
+                        selected.append(name)
+
+                except Exception:
+                    continue
 
         # ---------------------------------
         # Final fallback
         # ---------------------------------
 
-        return [self.rag_agent]
+        if not selected:
+            selected = ["research"]
+
+        # ---------------------------------
+        # Sort by relevance
+        # ---------------------------------
+
+        selected.sort(
+            key=lambda name: scores[name],
+            reverse=True
+        )
+
+        return [
+            self.agent_map[name]
+            for name in selected
+        ]
