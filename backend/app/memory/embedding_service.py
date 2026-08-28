@@ -2,18 +2,49 @@ from sentence_transformers import SentenceTransformer
 
 
 class EmbeddingService:
+    """
+    Lazy-loading embedding service.
+
+    The SentenceTransformer model is loaded only when
+    encode() or encode_batch() is actually called.
+    """
+
+    MODEL_NAME = "all-MiniLM-L6-v2"
 
     def __init__(self):
-        self.model = SentenceTransformer("all-MiniLM-L6-v2")
+        self.model = None
 
-    def encode(self, text: str):
-        """
-        Generate embedding vector for a text.
-        """
-        return self.model.encode(text).tolist()
+    def _get_model(self) -> SentenceTransformer:
+        """Load the embedding model only when required."""
 
-    def encode_batch(self, texts: list[str]):
+        if self.model is None:
+            self.model = SentenceTransformer(
+                self.MODEL_NAME
+            )
+
+        return self.model
+
+    def encode(self, text: str) -> list[float]:
+        """
+        Generate an embedding vector for a single text.
+        """
+
+        model = self._get_model()
+
+        return model.encode(
+            text
+        ).tolist()
+
+    def encode_batch(
+        self,
+        texts: list[str],
+    ) -> list[list[float]]:
         """
         Generate embeddings for multiple texts.
         """
-        return self.model.encode(texts).tolist()
+
+        model = self._get_model()
+
+        return model.encode(
+            texts
+        ).tolist()
