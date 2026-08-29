@@ -1,16 +1,9 @@
 from fastapi import FastAPI
 
-from app.api.auth import router as auth_router
-from app.api.chat import router as chat_router
 from app.api.tools import router as tools_router
-from app.database.database import Base, engine
-from app.models.memory import Memory
-from app.models.session import UserSession
-from app.models.user import User
-
-
-# Make sure all registered models have their tables.
-Base.metadata.create_all(bind=engine)
+from app.api.chat import router as chat_router
+from app.api.auth import router as auth_router
+from app.api.conversations import router as conversations_router
 
 
 app = FastAPI(
@@ -19,16 +12,22 @@ app = FastAPI(
 )
 
 
-# Existing HyperGPT routes
+# --------------------------------------------------
+# API Routers
+# --------------------------------------------------
+
 app.include_router(tools_router)
 app.include_router(chat_router)
-
-# Day 27 authentication routes
 app.include_router(auth_router)
+app.include_router(conversations_router)
 
+
+# --------------------------------------------------
+# Root Endpoint
+# --------------------------------------------------
 
 @app.get("/")
 def root():
     return {
-        "message": "HyperGPT Backend Running"
+        "message": "HyperGPT Backend Running",
     }

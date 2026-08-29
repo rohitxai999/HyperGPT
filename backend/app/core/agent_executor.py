@@ -1,246 +1,159 @@
-import asyncio
-import inspect
+﻿import inspect
 from typing import Any
-
-from app.core.planner import ExecutionPlan, TaskPlanner
 
 
 class AgentExecutor:
-    """
-    Executes HyperGPT plans.
+    """Executes HyperGPT agent plans using registered tools."""
 
-    Supports:
-    1. Existing synchronous tool executors.
-    2. Real asynchronous ToolExecutor.
-    """
-
-    def __init__(self, tool_executor):
+    def __init__(self, tool_executor=None):
         self.tool_executor = tool_executor
-        self.planner = TaskPlanner()
 
-    def _build_user_input(
-        self,
-        tool_name: str,
-        arguments: dict[str, Any],
-    ) -> str:
+    def execute_plan(self, plan):
         """
-        Convert structured planner arguments into
-        natural-language input for the real ToolExecutor.
+        Execute a plan.
+
+        Supports both:
+        - asynchronous real tool executors
+        - synchronous legacy/mock executors
         """
 
-        if tool_name == "calculator":
+        if self.tool_executor is not None:
+            execute_method = self.tool_executor.execute
 
-            operation = arguments.get("operation")
+            if inspect.iscoroutinefunction(execute_method):
+                return self._execute_plan_async(plan)
 
-            if operation == "add":
-                return (
-                    f"calculate "
-                    f"{arguments['a']} plus {arguments['b']}"
-                )
+        return self._execute_plan_sync(plan)
 
-            if operation == "subtract":
-                return (
-                    f"calculate "
-                    f"{arguments['a']} minus {arguments['b']}"
-                )
-
-            if operation == "multiply":
-                return (
-                    f"calculate "
-                    f"{arguments['a']} times {arguments['b']}"
-                )
-
-            if operation == "divide":
-                return (
-                    f"calculate "
-                    f"{arguments['a']} divided by {arguments['b']}"
-                )
-
-        return arguments.get(
-            "user_input",
-            ""
-        )
-
-    def _execute_sync(
-        self,
-        tool_name: str,
-        arguments: dict[str, Any],
-    ):
-        """
-        Execute against the legacy synchronous executor.
-        """
-
-        return self.tool_executor.execute(
-            tool_name,
-            arguments
-        )
-
-    async def _execute_async(
-        self,
-        tool_name: str,
-        arguments: dict[str, Any],
-    ):
-        """
-        Execute against the real asynchronous ToolExecutor.
-        """
-
-        user_input = self._build_user_input(
-            tool_name,
-            arguments
-        )
-
-        result = self.tool_executor.execute(
-            user_input
-        )
-
-        if inspect.isawaitable(result):
-            return await result
-
-        return result
-
-    def _is_real_async_executor(self) -> bool:
-        """
-        Detect whether the supplied executor exposes
-        an asynchronous execute() method.
-        """
-
-        execute_method = getattr(
-            self.tool_executor,
-            "execute",
-            None
-        )
-
-        return (
-            execute_method is not None
-            and inspect.iscoroutinefunction(
-                execute_method
-            )
-        )
-
-    def execute_plan(
-        self,
-        plan: ExecutionPlan,
-    ):
-        """
-        Public synchronous API.
-
-        Preserves compatibility with the original
-        AgentExecutor tests.
-        """
-
-        if self._is_real_async_executor():
-
-            return self._execute_real_async_plan(
-                plan
-            )
-
-        return self._execute_sync_plan(
-            plan
-        )
-
-    def _execute_sync_plan(
-        self,
-        plan: ExecutionPlan,
-    ) -> ExecutionPlan:
-        """
-        Execute plans using synchronous executors.
-        """
-
-        self.planner.start(plan)
+    def _execute_plan_sync(self, plan):
+        """Execute a plan using a synchronous tool executor."""
 
         for step in plan.steps:
-
             try:
+                step.status = "running"
 
-                result = self._execute_sync(
-                    step.tool,
-                    step.arguments
-                )
+                if self.tool_executor is None:
+                    result = step.parameters
 
-                self.planner.complete_step(
-                    step,
-                    result
-                )
+                else:
+                    execute_method = self.tool_executor.execute
 
-            except Exception as exc:
-
-                self.planner.fail_step(
-                    step,
-                    str(exc)
-                )
-
-                self.planner.fail_plan(
-                    plan
-                )
-
-                return plan
-
-        self.planner.complete_plan(
-            plan
-        )
-
-        return plan
-
-    async def _execute_real_async_plan(
-        self,
-        plan: ExecutionPlan,
-    ) -> ExecutionPlan:
-        """
-        Execute plans using the real asynchronous
-        HyperGPT ToolExecutor.
-        """
-
-        self.planner.start(plan)
-
-        for step in plan.steps:
-
-            try:
-
-                result = await self._execute_async(
-                    step.tool,
-                    step.arguments
-                )
-
-                if isinstance(result, dict):
-
-                    success = result.get(
-                        "success",
-                        True
+                    parameter_count = len(
+                        inspect.signature(execute_method).parameters
                     )
 
-                    if not success:
-
-                        self.planner.fail_step(
-                            step,
-                            result
+                    if parameter_count >= 2:
+                        result = execute_method(
+                            step.tool,
+                            step.parameters,
+                        )
+                    else:
+                        result = execute_method(
+                            step.description
                         )
 
-                        self.planner.fail_plan(
-                            plan
+                    if inspect.isawaitable(result):
+                        raise RuntimeError(
+                            "Asynchronous tool executor requires "
+                            "awaiting execute_plan()."
                         )
 
-                        return plan
+                    if (
+                        isinstance(result, dict)
+                        and result.get("success") is False
+                    ):
+                        raise RuntimeError(
+                            result.get(
+                                "error",
+                                result.get(
+                                    "message",
+                                    "Tool execution failed.",
+                                ),
+                            )
+                        )
 
-                self.planner.complete_step(
-                    step,
-                    result
-                )
+                step.result = result
+                step.status = "completed"
 
             except Exception as exc:
-
-                self.planner.fail_step(
-                    step,
-                    str(exc)
-                )
-
-                self.planner.fail_plan(
-                    plan
-                )
-
+                step.status = "failed"
+                step.result = {
+                    "success": False,
+                    "error": str(exc),
+                }
+                plan.status = "failed"
                 return plan
 
-        self.planner.complete_plan(
-            plan
-        )
-
+        plan.status = "completed"
         return plan
+
+    async def _execute_plan_async(self, plan):
+        """Execute a plan using an asynchronous tool executor."""
+
+        for step in plan.steps:
+            try:
+                step.status = "running"
+
+                if self.tool_executor is None:
+                    result = step.parameters
+
+                else:
+                    execute_method = self.tool_executor.execute
+
+                    parameter_count = len(
+                        inspect.signature(execute_method).parameters
+                    )
+
+                    if parameter_count >= 2:
+                        result = execute_method(
+                            step.tool,
+                            step.parameters,
+                        )
+                    else:
+                        result = execute_method(
+                            step.description
+                        )
+
+                    if inspect.isawaitable(result):
+                        result = await result
+
+                    if (
+                        isinstance(result, dict)
+                        and result.get("success") is False
+                    ):
+                        raise RuntimeError(
+                            result.get(
+                                "error",
+                                result.get(
+                                    "message",
+                                    "Tool execution failed.",
+                                ),
+                            )
+                        )
+
+                step.result = result
+                step.status = "completed"
+
+            except Exception as exc:
+                step.status = "failed"
+                step.result = {
+                    "success": False,
+                    "error": str(exc),
+                }
+                plan.status = "failed"
+                return plan
+
+        plan.status = "completed"
+        return plan
+
+    def execute(self, task: Any, context=None):
+        """Synchronous compatibility method."""
+        return {
+            "task": task,
+            "status": "completed",
+            "result": task,
+        }
+
+    def run(self, task: Any, context=None):
+        """Compatibility wrapper."""
+        return self.execute(task, context)
