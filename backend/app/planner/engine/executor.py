@@ -1,4 +1,4 @@
-from app.tools.registry import ToolRegistry
+from backend.app.tools.registry import ToolRegistry
 
 
 class Executor:

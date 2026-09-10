@@ -1,5 +1,5 @@
-from app.database.database import SessionLocal
-from app.database.memory_repository import MemoryRepository
+from backend.app.database.database import SessionLocal
+from backend.app.database.memory_repository import MemoryRepository
 
 
 def main():

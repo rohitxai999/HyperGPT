@@ -1,5 +1,5 @@
-from app.memory.embedding_service import EmbeddingService
-from app.memory.vector_index import VectorIndex
+from backend.app.memory.embedding_service import EmbeddingService
+from backend.app.memory.vector_index import VectorIndex
 
 embedder = EmbeddingService()
 index = VectorIndex()

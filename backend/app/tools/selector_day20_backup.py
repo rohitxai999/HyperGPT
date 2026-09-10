@@ -1,4 +1,4 @@
-from app.tools.registry import registry
+from backend.app.tools.registry import registry
 
 
 class ToolSelector:

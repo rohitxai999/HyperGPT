@@ -1,6 +1,6 @@
 import re
 
-from app.tools.registry import registry
+from backend.app.tools.registry import registry
 
 
 class ToolSelector:
@@ -275,3 +275,4 @@ class ToolSelector:
             return None
 
         return registry.get(selected_name)
+

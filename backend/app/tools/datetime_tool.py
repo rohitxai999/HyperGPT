@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.tools.base_tool import BaseTool
+from backend.app.tools.base_tool import BaseTool
 
 
 class DateTimeTool(BaseTool):
@@ -17,6 +17,7 @@ class DateTimeTool(BaseTool):
         "day",
         "today",
         "todays",
+        ""
         "clock",
         "current time",
         "current date",
@@ -33,3 +34,4 @@ class DateTimeTool(BaseTool):
             "time": now.strftime("%H:%M:%S"),
             "datetime": now.isoformat()
         }
+

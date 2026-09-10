@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.profile.profile_service import ProfileService
+from backend.app.profile.profile_service import ProfileService
 
 
 class ProfileUpdater:

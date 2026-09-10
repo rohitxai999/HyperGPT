@@ -7,9 +7,9 @@ from fastapi.security import OAuth2PasswordBearer
 from pwdlib import PasswordHash
 from sqlalchemy.orm import Session
 
-from app.database.database import get_db
-from app.models.session import UserSession
-from app.models.user import User
+from backend.app.database.database import get_db
+from backend.app.models.session import UserSession
+from backend.app.models.user import User
 
 
 SECRET_KEY = os.getenv(

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
-from app.models.memory import Memory
+from backend.app.models.memory import Memory
 
 
 class MemoryRepository:

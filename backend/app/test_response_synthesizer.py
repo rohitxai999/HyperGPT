@@ -1,4 +1,4 @@
-from app.services.response_synthesizer import ResponseSynthesizer
+from backend.app.services.response_synthesizer import ResponseSynthesizer
 
 synthesizer = ResponseSynthesizer()
 

@@ -1,28 +1,25 @@
 import re
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
-from app.agents.base_agent import BaseAgent
-from app.core.planner import TaskPlanner
-from app.core.agent_executor import AgentExecutor
-from app.tools.executor import ToolExecutor
+from backend.app.agents.base_agent import BaseAgent
+from backend.app.tools.registry import ToolRegistry
 
 
 class MathAgent(BaseAgent):
+    """
+    HyperGPT Math Agent.
+
+    Converts natural-language arithmetic requests into
+    calculator-tool executions.
+    """
 
     def __init__(self):
         super().__init__(
             name="Math Agent",
-            description="Handles mathematical problems and calculations."
-        )
-
-        self.planner = TaskPlanner()
-        self.tool_executor = ToolExecutor()
-        self.agent_executor = AgentExecutor(
-            self.tool_executor
+            description="Handles mathematical problems and calculations.",
         )
 
     def can_handle(self, query: str) -> bool:
-
         keywords = [
             "calculate",
             "solve",
@@ -32,194 +29,144 @@ class MathAgent(BaseAgent):
             "integral",
             "derivative",
             "multiply",
+            "multiplied",
+            "times",
             "add",
+            "plus",
             "subtract",
+            "minus",
             "divide",
+            "divided",
         ]
 
-        return any(
-            word in query.lower()
-            for word in keywords
-        )
+        normalized = query.lower()
+        return any(keyword in normalized for keyword in keywords)
 
     async def execute(
         self,
         task: str,
-        context: Dict[str, Any] | None = None
+        context: Optional[Dict[str, Any]] = None,
     ):
-        return await self.run(
-            task,
-            context=context
-        )
+        return await self.run(task, context=context)
 
     async def run(
         self,
         query: str,
-        context: Dict[str, Any] | None = None
+        context: Optional[Dict[str, Any]] = None,
     ):
-
-        plan = self.planner.create_plan(
-            query
-        )
-
+        context = context or {}
         normalized_query = query.lower()
-
-        # ---------------------------------
-        # Extract numbers
-        # ---------------------------------
 
         numbers = re.findall(
             r"-?\d+(?:\.\d+)?",
-            query
+            query,
         )
 
-        # ---------------------------------
-        # Create calculator plan
-        # ---------------------------------
-
-        if len(numbers) >= 2:
-
-            a = float(numbers[0])
-            b = float(numbers[1])
-
-            if a.is_integer():
-                a = int(a)
-
-            if b.is_integer():
-                b = int(b)
-
-            if "multiply" in normalized_query:
-
-                self.planner.add_step(
-                    plan,
-                    query,
-                    "calculator",
-                    {
-                        "operation": "multiply",
-                        "a": a,
-                        "b": b,
-                    },
-                )
-
-            elif "add" in normalized_query:
-
-                self.planner.add_step(
-                    plan,
-                    query,
-                    "calculator",
-                    {
-                        "operation": "add",
-                        "a": a,
-                        "b": b,
-                    },
-                )
-
-            elif "subtract" in normalized_query:
-
-                self.planner.add_step(
-                    plan,
-                    query,
-                    "calculator",
-                    {
-                        "operation": "subtract",
-                        "a": a,
-                        "b": b,
-                    },
-                )
-
-            elif "divide" in normalized_query:
-
-                self.planner.add_step(
-                    plan,
-                    query,
-                    "calculator",
-                    {
-                        "operation": "divide",
-                        "a": a,
-                        "b": b,
-                    },
-                )
-
-        # ---------------------------------
-        # No executable plan
-        # ---------------------------------
-
-        if not plan.steps:
-
+        if len(numbers) < 2:
             return {
                 "agent": self.name,
                 "response": (
                     f"Unable to create a calculator plan for: {query}"
                 ),
-                "memory_used": (
-                    context.get("memories", [])
-                    if context
-                    else []
-                ),
+                "memory_used": context.get("memories", []),
                 "status": "failed",
             }
 
-        # ---------------------------------
-        # Execute asynchronously
-        # ---------------------------------
+        a = float(numbers[0])
+        b = float(numbers[1])
 
-        plan = await self.agent_executor.execute_plan(
-            plan
-        )
+        if a.is_integer():
+            a = int(a)
 
-        # ---------------------------------
-        # Find completed steps
-        # ---------------------------------
+        if b.is_integer():
+            b = int(b)
 
-        completed_steps = [
-            step
-            for step in plan.steps
-            if step.status == "completed"
-        ]
+        operation = None
 
-        # ---------------------------------
-        # Execution failure
-        # ---------------------------------
+        if any(
+            word in normalized_query
+            for word in ["multiply", "multiplied", "times"]
+        ):
+            operation = "multiply"
 
-        if not completed_steps:
+        elif any(
+            word in normalized_query
+            for word in ["add", "plus"]
+        ):
+            operation = "add"
 
+        elif any(
+            word in normalized_query
+            for word in ["subtract", "minus"]
+        ):
+            operation = "subtract"
+
+        elif any(
+            word in normalized_query
+            for word in ["divide", "divided"]
+        ):
+            operation = "divide"
+
+        if operation is None:
             return {
                 "agent": self.name,
                 "response": (
-                    f"Math execution failed for: {query}"
+                    f"Unable to determine the mathematical operation "
+                    f"for: {query}"
                 ),
-                "memory_used": (
-                    context.get("memories", [])
-                    if context
-                    else []
-                ),
+                "memory_used": context.get("memories", []),
                 "status": "failed",
-                "plan_status": plan.status,
             }
 
-        # ---------------------------------
-        # Get final result
-        # ---------------------------------
+        registry = ToolRegistry()
 
-        result = completed_steps[-1].result
+        # Use the existing registry API.
+        if hasattr(registry, "auto_register"):
+            registry.auto_register()
+
+        tool = registry.get("calculator")
+
+        if tool is None:
+            return {
+                "agent": self.name,
+                "response": "Calculator tool is unavailable.",
+                "memory_used": context.get("memories", []),
+                "status": "failed",
+            }
+
+        result = tool.execute(
+            operation=operation,
+            a=a,
+            b=b,
+        )
+
+        if hasattr(result, "__await__"):
+            result = await result
 
         if isinstance(result, dict):
-            final_result = result.get(
-                "result",
-                result
-            )
+            if result.get("success") is False:
+                return {
+                    "agent": self.name,
+                    "response": str(result),
+                    "memory_used": context.get("memories", []),
+                    "status": "failed",
+                    "error": result,
+                }
+
+            final_result = result.get("result", result)
+
         else:
             final_result = result
 
         return {
             "agent": self.name,
             "response": str(final_result),
-            "memory_used": (
-                context.get("memories", [])
-                if context
-                else []
-            ),
+            "memory_used": context.get("memories", []),
             "status": "success",
-            "plan_status": plan.status,
-            "execution_plan": plan,
+            "operation": operation,
+            "inputs": {
+                "a": a,
+                "b": b,
+            },
+            "result": final_result,
         }

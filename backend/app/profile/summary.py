@@ -1,6 +1,6 @@
 import json
 
-from app.profile.profile_service import ProfileService
+from backend.app.profile.profile_service import ProfileService
 
 
 class ProfileSummaryService:

@@ -1,4 +1,4 @@
-from app.services.agent_router import AgentRouter
+from backend.app.services.agent_router import AgentRouter
 
 router = AgentRouter()
 

@@ -1,4 +1,4 @@
-from app.memory.embedding_service import EmbeddingService
+from backend.app.memory.embedding_service import EmbeddingService
 
 embedder = EmbeddingService()
 

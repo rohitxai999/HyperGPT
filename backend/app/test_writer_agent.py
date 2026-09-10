@@ -1,4 +1,4 @@
-from app.agents.writer_agent import WriterAgent
+from backend.app.agents.writer_agent import WriterAgent
 
 agent = WriterAgent()
 

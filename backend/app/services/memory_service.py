@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from app.memory.importance import MemoryImportanceScorer
-from app.memory.categories import MemoryCategoryClassifier
-from app.memory.ranking import MemoryRankingEngine
+from backend.app.memory.importance import MemoryImportanceScorer
+from backend.app.memory.categories import MemoryCategoryClassifier
+from backend.app.memory.ranking import MemoryRankingEngine
 
-from app.database.database import SessionLocal
-from app.database.memory_repository import MemoryRepository
+from backend.app.database.database import SessionLocal
+from backend.app.database.memory_repository import MemoryRepository
 
 
 class MemoryService:

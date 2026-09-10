@@ -1,10 +1,10 @@
-from app.agents.router import TaskRouter
+from backend.app.agents.router import TaskRouter
 
-from app.memory.memory_store import MemoryStore
-from app.memory.semantic_search import SemanticSearch
-from app.memory.memory_analyzer import MemoryAnalyzer
+from backend.app.memory.memory_store import MemoryStore
+from backend.app.memory.semantic_search import SemanticSearch
+from backend.app.memory.memory_analyzer import MemoryAnalyzer
 
-from app.services.context_service import ContextService
+from backend.app.services.context_service import ContextService
 
 
 class Orchestrator:

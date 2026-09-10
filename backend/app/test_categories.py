@@ -1,4 +1,4 @@
-from app.memory.categories import MemoryCategoryClassifier
+from backend.app.memory.categories import MemoryCategoryClassifier
 
 classifier = MemoryCategoryClassifier()
 

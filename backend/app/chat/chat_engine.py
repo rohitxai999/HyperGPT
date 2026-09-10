@@ -3,9 +3,9 @@ import os
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 
-from app.chat.memory import ConversationMemory
-from app.chat.prompt import build_prompt
-from app.rag.retriever import retrieve_documents
+from backend.app.chat.memory import ConversationMemory
+from backend.app.chat.prompt import build_prompt
+from backend.app.rag.retriever import retrieve_documents
 
 load_dotenv()
 
@@ -45,3 +45,4 @@ class ChatEngine:
         self.memory.add_ai_message(answer)
 
         return answer
+

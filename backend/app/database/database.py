@@ -21,64 +21,6 @@ SessionLocal = sessionmaker(
 Base = declarative_base()
 
 
-# --------------------------------------------------
-# Import models so SQLAlchemy registers all tables
-# --------------------------------------------------
-
-# Existing memory model
-try:
-    from app.memory.models import Memory
-except ImportError:
-    try:
-        from app.models.memory import Memory
-    except ImportError:
-        Memory = None
-
-
-# Existing profile model
-try:
-    from app.profile.models import UserProfile
-except ImportError:
-    UserProfile = None
-
-
-# Day 27 Authentication models
-try:
-    from app.models.user import User
-except ImportError:
-    User = None
-
-
-try:
-    from app.models.session import UserSession
-except ImportError:
-    UserSession = None
-
-
-# Day 28 Conversation models
-try:
-    from app.models.conversation import Conversation
-except ImportError:
-    Conversation = None
-
-
-try:
-    from app.models.message import Message
-except ImportError:
-    Message = None
-
-
-# --------------------------------------------------
-# Create all registered tables
-# --------------------------------------------------
-
-Base.metadata.create_all(bind=engine)
-
-
-# --------------------------------------------------
-# Database dependency
-# --------------------------------------------------
-
 def get_db():
     db = SessionLocal()
 
@@ -86,3 +28,41 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def init_db():
+    """
+    Initialize all HyperGPT database models.
+
+    Imports are intentionally performed inside this function
+    to avoid circular imports during Base initialization.
+    """
+
+    from backend.app.models.memory import Memory
+    from backend.app.models.user import User
+    from backend.app.models.session import UserSession
+
+    try:
+        from backend.app.models.conversation import Conversation
+    except ImportError:
+        Conversation = None
+
+    try:
+        from backend.app.models.message import Message
+    except ImportError:
+        Message = None
+
+    # Keep references alive so SQLAlchemy registers the models.
+    _ = (
+        Memory,
+        User,
+        UserSession,
+        Conversation,
+        Message,
+    )
+
+    Base.metadata.create_all(bind=engine)
+
+
+if __name__ == "__main__":
+    init_db()

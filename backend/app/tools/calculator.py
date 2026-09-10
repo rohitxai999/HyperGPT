@@ -1,6 +1,7 @@
 import re
+from typing import Any, Dict
 
-from app.tools.base_tool import BaseTool
+from backend.app.tools.base_tool import BaseTool
 
 
 class CalculatorTool(BaseTool):
@@ -10,6 +11,7 @@ class CalculatorTool(BaseTool):
     Supports:
     - Natural-language arithmetic through prepare_arguments()
     - Structured arithmetic through operation/a/b arguments
+    - Basic expression evaluation
     """
 
     name = "calculator"
@@ -34,10 +36,9 @@ class CalculatorTool(BaseTool):
         "percent",
     ]
 
-    def prepare_arguments(self, user_input: str):
+    def prepare_arguments(self, user_input: str) -> Dict[str, Any]:
         """
-        Convert natural-language arithmetic into
-        a basic mathematical expression.
+        Convert natural-language arithmetic into a mathematical expression.
         """
 
         text = user_input.lower().strip()
@@ -78,7 +79,7 @@ class CalculatorTool(BaseTool):
             "expression": expression,
         }
 
-    async def execute(self, **kwargs):
+    async def execute(self, **kwargs) -> Dict[str, Any]:
         """
         Execute either a structured arithmetic operation
         or a prepared mathematical expression.
@@ -88,15 +89,13 @@ class CalculatorTool(BaseTool):
         a = kwargs.get("a")
         b = kwargs.get("b")
 
-        # ==================================================
-        # STRUCTURED OPERATION MODE
-        # ==================================================
-
+        # Structured operation mode
         if operation is not None:
             try:
                 if a is None or b is None:
                     return {
                         "success": False,
+                        "tool": self.name,
                         "error": "Both 'a' and 'b' are required.",
                     }
 
@@ -126,6 +125,7 @@ class CalculatorTool(BaseTool):
                     if b == 0:
                         return {
                             "success": False,
+                            "tool": self.name,
                             "error": "Division by zero is not allowed.",
                         }
 
@@ -134,11 +134,13 @@ class CalculatorTool(BaseTool):
                 else:
                     return {
                         "success": False,
+                        "tool": self.name,
                         "error": f"Unsupported operation: {operation}",
                     }
 
                 return {
                     "success": True,
+                    "tool": self.name,
                     "operation": operation,
                     "a": a,
                     "b": b,
@@ -148,14 +150,12 @@ class CalculatorTool(BaseTool):
             except (TypeError, ValueError) as exc:
                 return {
                     "success": False,
+                    "tool": self.name,
                     "operation": operation,
                     "error": str(exc),
                 }
 
-        # ==================================================
-        # EXPRESSION MODE
-        # ==================================================
-
+        # Expression mode
         expression = kwargs.get("expression", "")
 
         expression = re.sub(
@@ -167,6 +167,7 @@ class CalculatorTool(BaseTool):
         if not expression:
             return {
                 "success": False,
+                "tool": self.name,
                 "error": "No valid mathematical expression provided.",
             }
 
@@ -179,6 +180,7 @@ class CalculatorTool(BaseTool):
 
             return {
                 "success": True,
+                "tool": self.name,
                 "expression": expression,
                 "result": result,
             }
@@ -186,6 +188,7 @@ class CalculatorTool(BaseTool):
         except Exception as exc:
             return {
                 "success": False,
+                "tool": self.name,
                 "expression": expression,
                 "error": str(exc),
             }

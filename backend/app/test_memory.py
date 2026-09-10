@@ -1,4 +1,4 @@
-from app.memory.memory_store import MemoryStore
+from backend.app.memory.memory_store import MemoryStore
 
 
 def test_memory_store():

@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from app.tools.registry import registry
-from app.tools.executor import ToolExecutor
-from app.tools.logger import logger
+from backend.app.tools.registry import registry
+from backend.app.tools.executor import ToolExecutor
+from backend.app.tools.logger import logger
 
 router = APIRouter(
     prefix="/tools",

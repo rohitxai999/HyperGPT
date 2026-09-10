@@ -2,20 +2,45 @@ from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Integer, String, Text
 
-from app.database.database import Base
+from backend.app.database.database import Base
 
 
 class Memory(Base):
+    """
+    Persistent memory model for HyperGPT.
+    """
+
     __tablename__ = "memories"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
 
-    user_id = Column(String, default="default", index=True)
+    user_id = Column(
+        String,
+        default="default",
+        index=True,
+    )
 
-    content = Column(Text, nullable=False)
+    content = Column(
+        Text,
+        nullable=False,
+    )
 
     # Day 12
-    importance = Column(Integer, default=1)
-    category = Column(String, default="Conversation")
+    importance = Column(
+        Integer,
+        default=1,
+    )
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    category = Column(
+        String,
+        default="Conversation",
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+    )

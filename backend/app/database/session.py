@@ -1,7 +1,7 @@
-from app.database.database import Base, engine
+from backend.app.database.database import Base, engine
 
 # Import all models so SQLAlchemy registers them
-from app.models.memory import Memory
+from backend.app.models.memory import Memory
 
 
 def init_database():

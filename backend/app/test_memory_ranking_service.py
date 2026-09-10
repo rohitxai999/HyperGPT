@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.services.memory_service import MemoryService
+from backend.app.services.memory_service import MemoryService
 
 
 service = MemoryService()

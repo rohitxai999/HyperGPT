@@ -1,20 +1,28 @@
-﻿from app.agents.router import TaskRouter
+from typing import Any, Dict, List
 
-from app.memory.memory_store import MemoryStore
-from app.memory.semantic_search import SemanticSearch
-from app.memory.memory_analyzer import MemoryAnalyzer
+from backend.app.agents.router import TaskRouter
 
-from app.services.context_service import ContextService
+from backend.app.memory.memory_store import MemoryStore
+from backend.app.memory.semantic_search import SemanticSearch
+from backend.app.memory.memory_analyzer import MemoryAnalyzer
+
+from backend.app.services.context_service import ContextService
 
 
 class Orchestrator:
     """
-    Coordinates HyperGPT agents and provides them
-    with memory and RAG context.
+    Central HyperGPT orchestrator.
+
+    Responsibilities:
+    - Retrieve memory and RAG context
+    - Route the user query to appropriate agents
+    - Execute routed agents
+    - Normalize agent responses
+    - Store important interactions in memory
+    - Return a unified response
     """
 
     def __init__(self):
-
         self.router = TaskRouter()
 
         self.memory_store = MemoryStore()
@@ -23,16 +31,26 @@ class Orchestrator:
 
         self.context_service = ContextService()
 
-    def _format_agent_response(self, result: dict) -> str:
+    # ==========================================================
+    # RESPONSE FORMATTING
+    # ==========================================================
+
+    def _format_agent_response(self, result: Any) -> str:
+        """
+        Convert an agent result into a readable response.
+        """
+
+        if not isinstance(result, dict):
+            return str(result)
 
         agent = result.get(
             "agent",
             "Unknown Agent"
         )
 
-        # ---------------------------------
+        # ------------------------------------------------------
         # Coding Agent
-        # ---------------------------------
+        # ------------------------------------------------------
 
         if result.get("generated_code"):
 
@@ -46,7 +64,7 @@ class Orchestrator:
             response = (
                 f"[{agent}]\n\n"
                 f"```python\n"
-                f"{code.strip()}\n"
+                f"{str(code).strip()}\n"
                 f"```\n"
             )
 
@@ -58,9 +76,9 @@ class Orchestrator:
 
             return response
 
-        # ---------------------------------
+        # ------------------------------------------------------
         # Planner Agent
-        # ---------------------------------
+        # ------------------------------------------------------
 
         if result.get("plan"):
 
@@ -81,9 +99,53 @@ class Orchestrator:
 
             return response.rstrip()
 
-        # ---------------------------------
-        # Research / Writing / RAG
-        # ---------------------------------
+        # ------------------------------------------------------
+        # Autonomous execution result
+        # ------------------------------------------------------
+
+        if result.get("results"):
+
+            execution_results = result["results"]
+
+            response = (
+                f"[{agent}]\n\n"
+                f"Execution Results:\n"
+            )
+
+            for item in execution_results:
+
+                task_id = item.get(
+                    "task_id",
+                    "?"
+                )
+
+                status = item.get(
+                    "status",
+                    "UNKNOWN"
+                )
+
+                response += (
+                    f"Task {task_id}: "
+                    f"{status}\n"
+                )
+
+                if item.get("result") is not None:
+                    response += (
+                        f"Result: "
+                        f"{item['result']}\n"
+                    )
+
+                if item.get("error"):
+                    response += (
+                        f"Error: "
+                        f"{item['error']}\n"
+                    )
+
+            return response.rstrip()
+
+        # ------------------------------------------------------
+        # Standard agent response
+        # ------------------------------------------------------
 
         response = result.get(
             "response"
@@ -96,9 +158,9 @@ class Orchestrator:
                 f"{response}"
             )
 
-        # ---------------------------------
-        # Generic result
-        # ---------------------------------
+        # ------------------------------------------------------
+        # Generic task response
+        # ------------------------------------------------------
 
         if result.get("task"):
 
@@ -107,31 +169,130 @@ class Orchestrator:
                 f"Task: {result['task']}"
             )
 
-        # ---------------------------------
+        # ------------------------------------------------------
+        # Generic result
+        # ------------------------------------------------------
+
+        if result.get("result") is not None:
+
+            return (
+                f"[{agent}]\n\n"
+                f"Result: {result['result']}"
+            )
+
+        # ------------------------------------------------------
         # Fallback
-        # ---------------------------------
+        # ------------------------------------------------------
 
         return (
             f"[{agent}]\n\n"
             f"No response generated."
         )
 
-    def run(self, query: str):
+    # ==========================================================
+    # AGENT EXECUTION
+    # ==========================================================
 
-        # ---------------------------------
+    async def _execute_agent(
+        self,
+        agent: Any,
+        query: str,
+        context: Dict[str, Any],
+    ) -> Any:
+        """
+        Execute an agent while supporting both synchronous
+        and asynchronous agent implementations.
+        """
+
+        try:
+
+            if hasattr(agent, "run"):
+
+                result = agent.run(
+                    query,
+                    context=context
+                )
+
+            else:
+
+                result = agent.execute(
+                    query,
+                    context=context
+                )
+
+        except TypeError:
+
+            try:
+
+                if hasattr(agent, "run"):
+                    result = agent.run(query)
+                else:
+                    result = agent.execute(query)
+
+            except AttributeError:
+
+                result = agent.execute(query)
+
+        # Handle coroutine results
+        if hasattr(result, "__await__"):
+            result = await result
+
+        return result
+
+    # ==========================================================
+    # MAIN ORCHESTRATION
+    # ==========================================================
+
+    async def run(
+        self,
+        query: str,
+    ) -> Dict[str, Any]:
+        """
+        Execute the complete HyperGPT orchestration pipeline.
+        """
+
+        # ------------------------------------------------------
+        # Validate query
+        # ------------------------------------------------------
+
+        query = str(query).strip()
+
+        if not query:
+
+            return {
+                "query": query,
+                "memory_context": [],
+                "rag_context": [],
+                "agent_context": {},
+                "responses": [],
+                "final_response": (
+                    "Please provide a task or question."
+                ),
+                "status": "failed",
+            }
+
+        # ------------------------------------------------------
         # Retrieve unified context
-        # ---------------------------------
+        # ------------------------------------------------------
 
-        context = self.context_service.get_full_context(
-            query
+        context = (
+            self.context_service
+            .get_full_context(query)
         )
 
-        related_memories = context["memories"]
-        documents = context["documents"]
+        related_memories = context.get(
+            "memories",
+            []
+        )
 
-        # ---------------------------------
+        documents = context.get(
+            "documents",
+            []
+        )
+
+        # ------------------------------------------------------
         # Build agent context
-        # ---------------------------------
+        # ------------------------------------------------------
 
         agent_context = {
             "query": query,
@@ -139,9 +300,9 @@ class Orchestrator:
             "documents": documents,
         }
 
-        # ---------------------------------
+        # ------------------------------------------------------
         # Route query
-        # ---------------------------------
+        # ------------------------------------------------------
 
         agents = self.router.route(query)
 
@@ -151,54 +312,60 @@ class Orchestrator:
                 "query": query,
                 "memory_context": related_memories,
                 "rag_context": documents,
+                "agent_context": agent_context,
                 "responses": [],
                 "final_response": (
                     "Sorry, I couldn't determine "
                     "which agent should handle "
                     "this request."
                 ),
+                "status": "failed",
             }
 
-        responses = []
-
-        # ---------------------------------
+        # ------------------------------------------------------
         # Execute agents
-        # ---------------------------------
+        # ------------------------------------------------------
+
+        responses: List[Any] = []
 
         for agent in agents:
 
             try:
 
-                result = agent.run(
+                result = await self._execute_agent(
+                    agent,
                     query,
-                    context=agent_context
+                    agent_context,
                 )
 
-            except AttributeError:
+                responses.append(result)
 
-                result = agent.execute(
-                    query,
-                    context=agent_context
+            except Exception as exc:
+
+                responses.append(
+                    {
+                        "agent": getattr(
+                            agent,
+                            "name",
+                            "Unknown Agent"
+                        ),
+                        "response": (
+                            "Agent execution failed: "
+                            f"{exc}"
+                        ),
+                        "status": "failed",
+                        "error": str(exc),
+                    }
                 )
 
-            except TypeError:
-
-                try:
-
-                    result = agent.run(query)
-
-                except AttributeError:
-
-                    result = agent.execute(query)
-
-            responses.append(result)
-
-        # ---------------------------------
+        # ------------------------------------------------------
         # Format responses
-        # ---------------------------------
+        # ------------------------------------------------------
 
         formatted_responses = [
-            self._format_agent_response(result)
+            self._format_agent_response(
+                result
+            )
             for result in responses
         ]
 
@@ -206,39 +373,80 @@ class Orchestrator:
             formatted_responses
         )
 
-        # ---------------------------------
+        # ------------------------------------------------------
         # Automatic memory analysis
-        # ---------------------------------
+        # ------------------------------------------------------
 
-        memory_analysis = (
-            self.memory_analyzer.analyze(query)
+        try:
+
+            memory_analysis = (
+                self.memory_analyzer
+                .analyze(query)
+            )
+
+        except Exception:
+
+            memory_analysis = {
+                "importance": 0.0
+            }
+
+        importance = float(
+            memory_analysis.get(
+                "importance",
+                0.0
+            )
         )
 
-        # ---------------------------------
-        # Save important memories
-        # ---------------------------------
+        # ------------------------------------------------------
+        # Save important memory
+        # ------------------------------------------------------
 
-        if memory_analysis["importance"] >= 0.5:
+        if importance >= 0.5:
 
-            memory = self.memory_store.save_memory(
-                content=(
-                    f"User: {query}\n"
-                    f"Assistant: {final_text}"
-                ),
-                user_id="default",
-                importance=(
-                    memory_analysis["importance"]
-                ),
-            )
+            try:
 
-            self.semantic.add_memory(
-                memory.id,
-                memory.content,
-            )
+                memory = (
+                    self.memory_store
+                    .save_memory(
+                        content=(
+                            f"User: {query}\n"
+                            f"Assistant: {final_text}"
+                        ),
+                        user_id="default",
+                        importance=importance,
+                    )
+                )
 
-        # ---------------------------------
-        # Final result
-        # ---------------------------------
+                self.semantic.add_memory(
+                    memory.id,
+                    memory.content,
+                )
+
+            except Exception:
+                # Memory failure should not
+                # destroy the main response.
+                pass
+
+        # ------------------------------------------------------
+        # Determine status
+        # ------------------------------------------------------
+
+        failed_responses = [
+            result
+            for result in responses
+            if isinstance(result, dict)
+            and result.get("status") == "failed"
+        ]
+
+        status = (
+            "partial"
+            if failed_responses
+            else "success"
+        )
+
+        # ------------------------------------------------------
+        # Final unified response
+        # ------------------------------------------------------
 
         return {
             "query": query,
@@ -246,5 +454,7 @@ class Orchestrator:
             "rag_context": documents,
             "agent_context": agent_context,
             "responses": responses,
+            "formatted_responses": formatted_responses,
             "final_response": final_text,
+            "status": status,
         }

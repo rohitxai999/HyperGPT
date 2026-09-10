@@ -1,4 +1,4 @@
-from app.memory.memory_analyzer import MemoryAnalyzer
+from backend.app.memory.memory_analyzer import MemoryAnalyzer
 
 
 class MemoryService:

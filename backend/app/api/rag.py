@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from app.rag.retriever import retrieve_documents
+from backend.app.rag.retriever import retrieve_documents
 
 
 router = APIRouter(

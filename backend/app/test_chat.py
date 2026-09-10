@@ -1,4 +1,4 @@
-from app.chat.chat_engine import ChatEngine
+from backend.app.chat.chat_engine import ChatEngine
 
 
 def main():

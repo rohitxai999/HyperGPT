@@ -1,8 +1,8 @@
-from app.agents.coding_agent import CodingAgent
-from app.agents.writing_agent import WritingAgent
-from app.agents.research_agent import ResearchAgent
-from app.agents.math_agent import MathAgent
-from app.agents.rag_agent import RAGAgent
+from backend.app.agents.coding_agent import CodingAgent
+from backend.app.agents.writing_agent import WritingAgent
+from backend.app.agents.research_agent import ResearchAgent
+from backend.app.agents.math_agent import MathAgent
+from backend.app.agents.rag_agent import RAGAgent
 
 
 class TaskRouter:

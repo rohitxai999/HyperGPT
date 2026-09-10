@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 
-from app.api.tools import router as tools_router
-from app.api.chat import router as chat_router
-from app.api.auth import router as auth_router
-from app.api.conversations import router as conversations_router
+from backend.app.api.tools import router as tools_router
+from backend.app.api.chat import router as chat_router
+from backend.app.api.auth import router as auth_router
+from backend.app.api.conversations import router as conversations_router
 
 
 app = FastAPI(

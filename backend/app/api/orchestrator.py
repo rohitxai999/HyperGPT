@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from app.agents.orchestrator import Orchestrator
-from app.services.memory_service import MemoryService
+from backend.app.agents.orchestrator import Orchestrator
+from backend.app.services.memory_service import MemoryService
 
 router = APIRouter(
     prefix="/orchestrator",

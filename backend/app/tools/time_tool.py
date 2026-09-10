@@ -1,15 +1,31 @@
 from datetime import datetime
 
+from backend.app.tools.base_tool import BaseTool
 
-class TimeTool:
+
+class TimeTool(BaseTool):
+    """
+    Returns the current local time.
+    """
 
     name = "time"
+    description = "Returns the current local time."
 
-    def execute(self):
+    keywords = [
+        "time",
+        "current time",
+        "clock",
+        "what time",
+        "right now",
+    ]
 
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    async def execute(self, **kwargs):
+        current_time = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
 
         return {
+            "success": True,
             "tool": self.name,
-            "result": current_time
+            "result": current_time,
         }

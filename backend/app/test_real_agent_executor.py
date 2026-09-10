@@ -1,8 +1,8 @@
 import pytest
 
-from app.core.agent_executor import AgentExecutor
-from app.core.planner import TaskPlanner
-from app.tools.executor import ToolExecutor
+from backend.app.core.agent_executor import AgentExecutor
+from backend.app.core.planner import TaskPlanner
+from backend.app.tools.executor import ToolExecutor
 
 
 @pytest.mark.asyncio

@@ -1,4 +1,4 @@
-from app.planner.models.task import Task
+from backend.app.planner.models.task import Task
 
 
 class Planner:

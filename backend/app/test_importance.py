@@ -1,4 +1,4 @@
-from app.memory.importance import MemoryImportanceScorer
+from backend.app.memory.importance import MemoryImportanceScorer
 
 scorer = MemoryImportanceScorer()
 

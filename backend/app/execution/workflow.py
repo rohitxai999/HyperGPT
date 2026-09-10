@@ -1,5 +1,5 @@
-from app.planner.engine.planner import Planner
-from app.planner.engine.executor import Executor
+from backend.app.planner.engine.planner import Planner
+from backend.app.planner.engine.executor import Executor
 
 
 class WorkflowManager:

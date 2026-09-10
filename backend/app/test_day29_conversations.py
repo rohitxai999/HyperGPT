@@ -2,12 +2,12 @@ import uuid
 
 from fastapi.testclient import TestClient
 
-from app.api.chat import orchestrator
-from app.database.database import SessionLocal
-from app.main import app
-from app.models.conversation import Conversation
-from app.models.message import Message
-from app.models.user import User
+from backend.app.api.chat import orchestrator
+from backend.app.database.database import SessionLocal
+from backend.app.main import app
+from backend.app.models.conversation import Conversation
+from backend.app.models.message import Message
+from backend.app.models.user import User
 
 
 client = TestClient(app)
@@ -290,3 +290,4 @@ def test_user_cannot_access_another_users_conversation(
     finally:
         cleanup_user(user1_credentials["email"])
         cleanup_user(user2_credentials["email"])
+

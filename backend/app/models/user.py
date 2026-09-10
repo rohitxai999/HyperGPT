@@ -2,10 +2,14 @@ from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 
-from app.database.database import Base
+from backend.app.database.database import Base
 
 
 class User(Base):
+    """
+    HyperGPT user model.
+    """
+
     __tablename__ = "users"
 
     id = Column(

@@ -1,5 +1,5 @@
-from app.tools.selector import ToolSelector
-from app.tools.logger import logger
+from backend.app.tools.selector import ToolSelector
+from backend.app.tools.logger import logger
 
 
 class ToolExecutor:

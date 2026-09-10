@@ -4,17 +4,17 @@ import shutil
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from pydantic import BaseModel
 
-from app.schemas.rag import (
+from backend.app.schemas.rag import (
     AskDocumentRequest,
     AskDocumentResponse,
 )
 
-from app.services.rag_service import (
+from backend.app.services.rag_service import (
     process_document,
     ask_document,
 )
 
-from app.rag.retriever import retrieve_documents
+from backend.app.rag.retriever import retrieve_documents
 
 
 router = APIRouter(

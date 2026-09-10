@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, Text
 
-from app.database.database import Base
+from backend.app.database.database import Base
 
 
 class Message(Base):
@@ -23,7 +22,7 @@ class Message(Base):
     )
 
     role = Column(
-        String(20),
+        Text,
         nullable=False,
     )
 
@@ -38,7 +37,10 @@ class Message(Base):
         nullable=False,
     )
 
-    conversation = relationship(
+    conversation = __import__(
+        "sqlalchemy.orm",
+        fromlist=["relationship"],
+    ).relationship(
         "Conversation",
         back_populates="messages",
     )

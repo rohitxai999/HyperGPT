@@ -2,7 +2,7 @@ import json
 
 from sqlalchemy.orm import Session
 
-from app.profile.models import UserProfile
+from backend.app.profile.models import UserProfile
 
 
 class ProfileRepository:

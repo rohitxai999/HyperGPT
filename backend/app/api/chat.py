@@ -4,12 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from app.agents.orchestrator import Orchestrator
-from app.auth.security import get_current_user
-from app.database.database import get_db
-from app.models.conversation import Conversation
-from app.models.message import Message
-from app.models.user import User
+from backend.app.agents.orchestrator import Orchestrator
+from backend.app.auth.security import get_current_user
+from backend.app.database.database import get_db
+from backend.app.models.conversation import Conversation
+from backend.app.models.message import Message
+from backend.app.models.user import User
 
 
 router = APIRouter()
@@ -138,3 +138,4 @@ def chat(
     result["assistant_message_id"] = assistant_message.id
 
     return result
+

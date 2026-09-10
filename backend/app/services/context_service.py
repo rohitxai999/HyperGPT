@@ -1,5 +1,5 @@
-from app.memory.memory_retriever import MemoryRetriever
-from app.rag.retriever import retrieve_documents
+from backend.app.memory.memory_retriever import MemoryRetriever
+from backend.app.rag.retriever import retrieve_documents
 
 
 class ContextService:

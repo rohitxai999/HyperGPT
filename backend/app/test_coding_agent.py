@@ -1,4 +1,4 @@
-from app.agents.coding_agent import CodingAgent
+from backend.app.agents.coding_agent import CodingAgent
 
 agent = CodingAgent()
 

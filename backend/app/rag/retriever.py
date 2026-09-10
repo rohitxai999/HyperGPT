@@ -1,5 +1,5 @@
-from app.rag.vectorstore import create_vector_store
-from app.rag.embeddings import generate_embeddings
+from backend.app.rag.vectorstore import create_vector_store
+from backend.app.rag.embeddings import generate_embeddings
 
 
 

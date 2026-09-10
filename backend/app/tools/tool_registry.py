@@ -1,6 +1,6 @@
-from app.tools.calculator_tool import CalculatorTool
-from app.tools.time_tool import TimeTool
-from app.tools.file_writer_tool import FileWriterTool
+from backend.app.tools.calculator_tool import CalculatorTool
+from backend.app.tools.time_tool import TimeTool
+from backend.app.tools.file_writer_tool import FileWriterTool
 
 
 class ToolRegistry:
@@ -15,3 +15,4 @@ class ToolRegistry:
 
     def get(self, tool_name: str):
         return self.tools.get(tool_name)
+

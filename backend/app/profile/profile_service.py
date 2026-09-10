@@ -1,7 +1,7 @@
 import json
 from sqlalchemy.orm import Session
 
-from app.profile.repository import ProfileRepository
+from backend.app.profile.repository import ProfileRepository
 
 
 class ProfileService:

@@ -1,4 +1,4 @@
-from app.memory.semantic_search import SemanticSearch
+from backend.app.memory.semantic_search import SemanticSearch
 
 search = SemanticSearch()
 

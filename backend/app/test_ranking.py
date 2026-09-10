@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from app.memory.ranking import MemoryRankingEngine
+from backend.app.memory.ranking import MemoryRankingEngine
 
 engine = MemoryRankingEngine()
 

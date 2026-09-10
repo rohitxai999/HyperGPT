@@ -1,4 +1,4 @@
-from app.agents.research_agent import ResearchAgent
+from backend.app.agents.research_agent import ResearchAgent
 
 agent = ResearchAgent()
 

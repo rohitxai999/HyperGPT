@@ -1,8 +1,9 @@
-from app.models.memory import Memory
-from app.models.user import User
-from app.models.session import UserSession
-from app.models.conversation import Conversation
-from app.models.message import Message
+from backend.app.models.memory import Memory
+from backend.app.models.user import User
+from backend.app.models.session import UserSession
+from backend.app.models.conversation import Conversation
+from backend.app.models.message import Message
+
 
 __all__ = [
     "Memory",

@@ -1,6 +1,6 @@
 import chromadb
 
-from app.rag.embeddings import generate_embeddings
+from backend.app.rag.embeddings import generate_embeddings
 
 
 client = chromadb.PersistentClient(

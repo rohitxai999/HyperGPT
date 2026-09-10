@@ -1,4 +1,4 @@
-from app.agents.registry import AgentRegistry
+from backend.app.agents.registry import AgentRegistry
 
 
 class AgentRouter:

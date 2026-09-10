@@ -1,5 +1,5 @@
-from app.planner.autonomous_planner import AutonomousPlanner
-from app.planner.execution_engine import ExecutionEngine
+from backend.app.planner.autonomous_planner import AutonomousPlanner
+from backend.app.planner.execution_engine import ExecutionEngine
 
 
 def main():

@@ -1,4 +1,4 @@
-from app.agents.planner_agent import PlannerAgent
+from backend.app.agents.planner_agent import PlannerAgent
 
 agent = PlannerAgent()
 

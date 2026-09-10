@@ -1,4 +1,4 @@
-from app.agents.reviewer_agent import ReviewerAgent
+from backend.app.agents.reviewer_agent import ReviewerAgent
 
 agent = ReviewerAgent()
 

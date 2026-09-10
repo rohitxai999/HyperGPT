@@ -1,6 +1,6 @@
-from app.memory.memory_store import MemoryStore
-from app.memory.memory_search import MemorySearch
-from app.memory.semantic_search import SemanticSearch
+from backend.app.memory.memory_store import MemoryStore
+from backend.app.memory.memory_search import MemorySearch
+from backend.app.memory.semantic_search import SemanticSearch
 
 
 class MemoryRetriever:

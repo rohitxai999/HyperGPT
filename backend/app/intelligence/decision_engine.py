@@ -1,6 +1,6 @@
-from app.profile.profile_service import ProfileService
-from app.profile.summary import ProfileSummaryService
-from app.timeline.timeline_service import TimelineService
+from backend.app.profile.profile_service import ProfileService
+from backend.app.profile.summary import ProfileSummaryService
+from backend.app.timeline.timeline_service import TimelineService
 
 
 class DecisionEngine:

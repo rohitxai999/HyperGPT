@@ -1,6 +1,6 @@
 import re
 
-from app.memory.memory_store import MemoryStore
+from backend.app.memory.memory_store import MemoryStore
 
 
 class MemorySearch:

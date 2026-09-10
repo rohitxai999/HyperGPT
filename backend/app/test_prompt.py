@@ -1,4 +1,4 @@
-from app.services.context_service import ContextService
+from backend.app.services.context_service import ContextService
 
 
 def test_context_service():

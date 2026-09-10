@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from app.rag.loader import load_document
-from app.rag.splitter import split_documents
-from app.rag.vectorstore import create_vector_store
-from app.rag.retriever import retrieve_documents
+from backend.app.rag.loader import load_document
+from backend.app.rag.splitter import split_documents
+from backend.app.rag.vectorstore import create_vector_store
+from backend.app.rag.retriever import retrieve_documents
 
 
 UPLOADS_DIR = Path("uploads")

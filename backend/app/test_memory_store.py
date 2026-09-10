@@ -1,5 +1,5 @@
-from app.database.session import init_database
-from app.memory.memory_store import MemoryStore
+from backend.app.database.session import init_database
+from backend.app.memory.memory_store import MemoryStore
 
 # Create tables before testing
 init_database()
