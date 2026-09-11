@@ -23,7 +23,7 @@ class ChatRequest(BaseModel):
 
 
 @router.post("/chat")
-def chat(
+async def chat(
     request: ChatRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -91,7 +91,7 @@ def chat(
     # --------------------------------------------------
 
     try:
-        result = orchestrator.run(query)
+        result = await orchestrator.run(query)
 
     except Exception:
         db.rollback()
